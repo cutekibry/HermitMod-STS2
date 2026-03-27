@@ -25,6 +25,35 @@ public static class HermitVisualBuilder
         root.AddChild(bounds);
         bounds.Owner = root;
 
+        // Required marker nodes for VFX targeting (block gain, damage, etc.)
+        var centerPos = new Marker2D();
+        centerPos.Name = "CenterPos";
+        centerPos.UniqueNameInOwner = true;
+        centerPos.Position = new Vector2(0, -165);
+        root.AddChild(centerPos);
+        centerPos.Owner = root;
+
+        var orbPos = new Marker2D();
+        orbPos.Name = "OrbPos";
+        orbPos.UniqueNameInOwner = true;
+        orbPos.Position = new Vector2(-130, -165);
+        root.AddChild(orbPos);
+        orbPos.Owner = root;
+
+        var talkPos = new Marker2D();
+        talkPos.Name = "TalkPos";
+        talkPos.UniqueNameInOwner = true;
+        talkPos.Position = new Vector2(50, -300);
+        root.AddChild(talkPos);
+        talkPos.Owner = root;
+
+        var intentPos = new Marker2D();
+        intentPos.Name = "IntentPos";
+        intentPos.UniqueNameInOwner = true;
+        intentPos.Position = new Vector2(0, -340);
+        root.AddChild(intentPos);
+        intentPos.Owner = root;
+
         // Visuals container
         var visuals = new Node2D();
         visuals.Name = "Visuals";
@@ -85,18 +114,18 @@ public static class HermitVisualBuilder
         leftArm.AddChild(gun);
         gun.Owner = root;
 
-        // Head (positioned so hat→absolute(-6,-215), eye→absolute(7,-198) matching .tscn)
+        // Head — hat sits on top, eyes peek out from under the brim
         var head = new Node2D();
         head.Name = "Head";
-        head.Position = new Vector2(-2, -110);
+        head.Position = new Vector2(-2, -105);
         waist.AddChild(head);
         head.Owner = root;
 
-        var hat = CreateSprite("Hat", CharDir + "hat.png", new Vector2(-6, -10));
+        var hat = CreateSprite("Hat", CharDir + "hat.png", new Vector2(-4, -18));
         head.AddChild(hat);
         hat.Owner = root;
 
-        var eye = CreateSprite("Eye", CharDir + "eye.png", new Vector2(7, 7));
+        var eye = CreateSprite("Eye", CharDir + "eye.png", new Vector2(5, 2));
         head.AddChild(eye);
         eye.Owner = root;
 
@@ -163,9 +192,9 @@ public static class HermitVisualBuilder
         t = anim.AddTrack(Animation.TrackType.Value);
         anim.TrackSetPath(t, "Visuals/Waist/Head:position");
         anim.TrackSetInterpolationType(t, Animation.InterpolationType.Cubic);
-        anim.TrackInsertKey(t, 0f, new Vector2(-2, -110));
-        anim.TrackInsertKey(t, 0.8333f, new Vector2(-2, -108.2f));
-        anim.TrackInsertKey(t, 1.6666f, new Vector2(-2, -110));
+        anim.TrackInsertKey(t, 0f, new Vector2(-2, -105));
+        anim.TrackInsertKey(t, 0.8333f, new Vector2(-2, -103.2f));
+        anim.TrackInsertKey(t, 1.6666f, new Vector2(-2, -105));
 
         // Head tilt
         t = anim.AddTrack(Animation.TrackType.Value);
@@ -236,9 +265,9 @@ public static class HermitVisualBuilder
         t = anim.AddTrack(Animation.TrackType.Value);
         anim.TrackSetPath(t, "Visuals/Waist/Head:position");
         anim.TrackSetInterpolationType(t, Animation.InterpolationType.Cubic);
-        anim.TrackInsertKey(t, 0f, new Vector2(-2, -110));
-        anim.TrackInsertKey(t, 0.0833f, new Vector2(9.55f, -115.88f));
-        anim.TrackInsertKey(t, 0.5f, new Vector2(-2, -110));
+        anim.TrackInsertKey(t, 0f, new Vector2(-2, -105));
+        anim.TrackInsertKey(t, 0.0833f, new Vector2(9.55f, -110.88f));
+        anim.TrackInsertKey(t, 0.5f, new Vector2(-2, -105));
 
         // Head rotation on hit
         t = anim.AddTrack(Animation.TrackType.Value);
