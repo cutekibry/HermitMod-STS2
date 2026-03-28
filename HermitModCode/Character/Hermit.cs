@@ -52,17 +52,11 @@ public class Hermit : PlaceholderCharacterModel
     public override string CustomCharacterSelectIconPath => "HermitButton.png".CharacterUiPath();
     public override string CustomCharacterSelectLockedIconPath => "HermitButton.png".CharacterUiPath();
 
-    // In-game UI icons — override scene-based icon to null so texture path is used
+    // In-game UI icons
     public override string CustomIconTexturePath => "HermitButton.png".CharacterUiPath();
-    public override string? CustomIconPath => null;
 
     // Map marker
     public override string CustomMapMarkerPath => "HermitButton.png".CharacterUiPath();
-
-    // Override rest site and merchant to null to avoid showing Ironclad placeholder
-    // (will use a generic silhouette until custom art is created)
-    public override string? CustomRestSiteAnimPath => null;
-    public override string? CustomMerchantAnimPath => null;
 
     // Sound effects — use crossbow sound as gun placeholder
     public override string CharacterTransitionSfx => "event:/sfx/ui/wipe_ironclad";
