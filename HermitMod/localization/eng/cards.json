@@ -152,5 +152,27 @@
   "HERMITMOD-FROM_BEYOND.title": "From Beyond",
   "HERMITMOD-FROM_BEYOND.description": "For each card in your [gold]exhaust pile[/gold], a random enemy loses {Damage:diff()} HP.",
   "HERMITMOD-VIRTUE.title": "Virtue",
-  "HERMITMOD-VIRTUE.description": "Reduce each debuff on you by 1."
+  "HERMITMOD-VIRTUE.description": "Reduce each debuff on you by 1.",
+
+  "HERMITMOD-STEADY_AIM.title": "Steady Aim",
+  "HERMITMOD-STEADY_AIM.description": "Gain {SniperFocusPower:diff()} [gold]Sniper Focus[/gold].\n(Single-target attacks deal 3 more damage per stack.)",
+  "HERMITMOD-CALIBRATE.title": "Calibrate",
+  "HERMITMOD-CALIBRATE.description": "Gain {Block:diff()} Block.\n[gold]Dead On[/gold]: Apply {VulnerablePower:diff()} [gold]Vulnerable[/gold].",
+  "HERMITMOD-SCOPE_IN.title": "Scope In",
+  "HERMITMOD-SCOPE_IN.description": "Gain {StrengthPower:diff()} [gold]Strength[/gold] this turn.",
+  "HERMITMOD-PIERCING_ROUND.title": "Piercing Round",
+  "HERMITMOD-PIERCING_ROUND.description": "Deal {Damage:diff()} damage.\nIgnores [gold]Block[/gold].",
+  "HERMITMOD-KILL_SHOT.title": "Kill Shot",
+  "HERMITMOD-KILL_SHOT.description": "Deal {Damage:diff()} damage.\nIf Fatal, draw 2 cards and gain 1 Energy.",
+
+  "HERMITMOD-SPRAY_PATTERN.title": "Spray Pattern",
+  "HERMITMOD-SPRAY_PATTERN.description": "At the start of your turn, deal {Damage:diff()} damage to ALL enemies.",
+  "HERMITMOD-DUCK_AND_COVER.title": "Duck and Cover",
+  "HERMITMOD-DUCK_AND_COVER.description": "Gain {Block:diff()} Block.\nApply {BruisePower:diff()} [gold]Bruise[/gold] to ALL enemies.",
+  "HERMITMOD-SUPPRESSIVE_FIRE.title": "Suppressive Fire",
+  "HERMITMOD-SUPPRESSIVE_FIRE.description": "Apply {WeakPower:diff()} [gold]Weak[/gold] and {BruisePower:diff()} [gold]Bruise[/gold] to ALL enemies.",
+  "HERMITMOD-BUCKSHOT.title": "Buckshot",
+  "HERMITMOD-BUCKSHOT.description": "Deal {Damage:diff()} damage to ALL enemies 2 times.",
+  "HERMITMOD-FAN_THE_HAMMER.title": "Fan the Hammer",
+  "HERMITMOD-FAN_THE_HAMMER.description": "Deal {Damage:diff()} damage to a random enemy X+1 times."
 }

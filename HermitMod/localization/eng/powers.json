@@ -67,5 +67,13 @@
   "HERMITMOD-COALESCENCE_POWER.smartDescription": "At the end of your turn, [gold]Retain[/gold] up to {CoalescencePower:diff()} card(s).",
   "HERMITMOD-REPRIEVE_POWER.smartDescription": "Take {ReprievePower:diff()} extra turn(s) after this one.",
   "HERMITMOD-PET_GHOST_POWER.smartDescription": "You cannot die. Die at the end of your next turn.",
-  "HERMITMOD-RYE_STALK_POWER.smartDescription": "At the end of this turn, [gold]Retain[/gold] any number of cards."
+  "HERMITMOD-RYE_STALK_POWER.smartDescription": "At the end of this turn, [gold]Retain[/gold] any number of cards.",
+
+  "HERMITMOD-SNIPER_FOCUS_POWER.title": "Sniper Focus",
+  "HERMITMOD-SNIPER_FOCUS_POWER.description": "Your single-target attacks deal {SniperFocusPower:diff()} additional damage per stack.",
+  "HERMITMOD-SNIPER_FOCUS_POWER.smartDescription": "Your single-target attacks deal {SniperFocusPower:diff()} additional damage per stack.",
+
+  "HERMITMOD-SPRAY_PATTERN_POWER.title": "Spray Pattern",
+  "HERMITMOD-SPRAY_PATTERN_POWER.description": "At the start of your turn, deal {SprayPatternPower:diff()} damage to ALL enemies.",
+  "HERMITMOD-SPRAY_PATTERN_POWER.smartDescription": "At the start of your turn, deal {SprayPatternPower:diff()} damage to ALL enemies."
 }
