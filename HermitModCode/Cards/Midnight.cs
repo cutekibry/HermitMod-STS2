@@ -9,7 +9,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Gain 8 Block. Draw 1 card.
+/// Gain 8 Block. Add an Impending Doom to your hand.
 /// Upgrade: 11 Block.
 /// </summary>
 public sealed class Midnight : HermitCard
@@ -25,7 +25,10 @@ public sealed class Midnight : HermitCard
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
-        await CardPileCmd.Draw(ctx, 1, Owner, false);
+
+        // Add an Impending Doom to hand
+        var doom = CombatState.CreateCard<ImpendingDoom>(Owner);
+        await CardPileCmd.AddGeneratedCardToCombat(doom, PileType.Hand, addedByPlayer: true);
     }
 
     protected override void OnUpgrade()

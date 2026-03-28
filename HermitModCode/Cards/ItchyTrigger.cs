@@ -10,8 +10,8 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Deal 8 damage. Dead On: Draw 1 card.
-/// Upgrade: 11 damage, Draw 2.
+/// Deal 8 damage. Dead On: Reduce the cost of a random card in your hand by 1 this turn.
+/// Upgrade: 11 damage.
 /// </summary>
 public sealed class ItchyTrigger : HermitCard
 {
@@ -30,7 +30,18 @@ public sealed class ItchyTrigger : HermitCard
         if (DeadOnHelper.IsDeadOn)
         {
             DeadOnHelper.IncrementDeadOnCount();
-            await CardPileCmd.Draw(ctx, 1, Owner, false);
+
+            // Reduce cost of a random card in hand by 1 this turn
+            var handCards = PileType.Hand.GetPile(Owner).Cards
+                .Where(c => !c.EnergyCost.CostsX && c != this)
+                .ToList();
+
+            if (handCards.Count > 0)
+            {
+                var rng = new Random();
+                var target = handCards[rng.Next(handCards.Count)];
+                target.EnergyCost.AddThisTurnOrUntilPlayed(-1, reduceOnly: true);
+            }
         }
     }
 

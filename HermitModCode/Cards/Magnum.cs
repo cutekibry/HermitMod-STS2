@@ -1,4 +1,5 @@
 using HermitMod.Cards;
+using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -24,12 +25,33 @@ public sealed class Magnum : HermitCard
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
-        await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
+        // Prompt player to discard up to 6 cards
+        var handCount = PileType.Hand.GetPile(Owner).Cards.Count;
+        int maxDiscard = Math.Min(DiscardCount, handCount);
 
-        // Deal damage 6 times (simplified from discard-per-hit)
-        for (int i = 0; i < DiscardCount; i++)
+        if (maxDiscard > 0)
         {
-            await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+            var selected = (await CardSelectCmd.FromHandForDiscard(
+                ctx,
+                Owner,
+                new CardSelectorPrefs(CardSelectorPrefs.DiscardSelectionPrompt, maxDiscard, maxDiscard),
+                null,
+                this
+            )).ToList();
+
+            if (selected.Count > 0)
+            {
+                await CardCmd.Discard(ctx, selected);
+
+                await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
+
+                // Deal damage once per card discarded
+                for (int i = 0; i < selected.Count; i++)
+                {
+                    if (play.Target?.IsDead == true) break;
+                    await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+                }
+            }
         }
     }
 

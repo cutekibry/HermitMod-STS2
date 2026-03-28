@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Models;
@@ -16,9 +18,13 @@ namespace HermitMod.Patches;
 /// For odd hand sizes: the exact middle position.
 /// For even hand sizes: either of the two center positions.
 ///
-/// Patches Hook.BeforeCardPlayed to capture the card's position before it leaves the hand,
-/// and Hook.AfterCardPlayed to reset the flag after the card finishes playing.
-/// Also patches Hook.BeforeSideTurnStart to reset the per-turn trigger counter.
+/// Patches CardModel.OnPlayWrapper (prefix) to capture the card's hand position
+/// BEFORE the card is moved from hand to play pile. The old Hook.BeforeCardPlayed
+/// patch was too late — by that point AddDuringManualCardPlay had already removed
+/// the card from the hand.
+///
+/// Also patches Hook.AfterCardPlayed to reset the flag, and
+/// Hook.BeforeSideTurnStart to reset the per-turn trigger counter.
 /// </summary>
 public static class DeadOnHelper
 {
@@ -66,22 +72,24 @@ public static class DeadOnHelper
 }
 
 /// <summary>
-/// Prefix patch on Hook.BeforeCardPlayed to capture the card's hand position
-/// before it is removed from the hand. Sets DeadOnHelper flag accordingly.
+/// Prefix patch on CardModel.OnPlayWrapper to capture the card's hand position
+/// BEFORE AddDuringManualCardPlay removes it from the hand.
+/// This is the earliest point where we know the card is being played and it's
+/// still in the hand pile at its correct position.
 /// Also checks for ConcentrationPower — if present, Dead On auto-triggers.
 /// </summary>
-[HarmonyPatch(typeof(Hook), nameof(Hook.BeforeCardPlayed))]
-public static class DeadOnBeforeCardPlayedPatch
+[HarmonyPatch(typeof(CardModel), nameof(CardModel.OnPlayWrapper))]
+public static class DeadOnOnPlayWrapperPatch
 {
     [HarmonyPrefix]
-    public static void Prefix(CardPlay cardPlay)
+    public static void Prefix(CardModel __instance, Creature? target, bool isAutoPlay)
     {
-        // Default to false
+        // Default to false at the start of every card play
         DeadOnHelper.SetDeadOn(false);
 
-        if (cardPlay?.Card?.Owner == null) return;
+        if (__instance?.Owner == null) return;
 
-        var owner = cardPlay.Card.Owner;
+        var owner = __instance.Owner;
 
         // Check if the owner has ConcentrationPower — if so, Dead On always triggers
         var concentrationPower = owner.Creature?.Powers?
@@ -94,13 +102,25 @@ public static class DeadOnBeforeCardPlayedPatch
             return;
         }
 
-        // Get the hand pile and find the card's index before it is removed
-        var handCards = PileType.Hand.GetPile(owner).Cards;
+        // Card must be in the hand to check position
+        var pile = __instance.Pile;
+        if (pile == null || pile.Type != PileType.Hand) return;
+
+        var handCards = pile.Cards;
         if (handCards == null) return;
 
-        var cardList = handCards.ToList();
-        int handSize = cardList.Count;
-        int cardIndex = cardList.IndexOf(cardPlay.Card);
+        int handSize = handCards.Count;
+        int cardIndex = -1;
+
+        // Find the card's index in the hand
+        for (int i = 0; i < handCards.Count; i++)
+        {
+            if (handCards[i] == __instance)
+            {
+                cardIndex = i;
+                break;
+            }
+        }
 
         if (cardIndex < 0) return;
 

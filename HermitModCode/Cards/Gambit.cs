@@ -26,12 +26,27 @@ public sealed class Gambit : HermitCard
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
-        // Simplified: Draw cards from draw pile
-        await CardPileCmd.Draw(ctx, CardCount, Owner, false);
+        int count = DynamicVars.Cards.IntValue;
+
+        // Get attacks from discard pile
+        var discardCards = PileType.Discard.GetPile(Owner).Cards
+            .Where(c => c.Type == CardType.Attack)
+            .ToList();
+
+        // Shuffle and take up to count
+        var rng = new Random();
+        var selected = discardCards.OrderBy(_ => rng.Next()).Take(count).ToList();
+
+        foreach (var card in selected)
+        {
+            // Move from discard to hand and reduce cost by 1 this turn
+            await CardPileCmd.Add(card, PileType.Hand);
+            card.EnergyCost.AddThisTurnOrUntilPlayed(-1, reduceOnly: true);
+        }
     }
 
     protected override void OnUpgrade()
     {
-        // 2 -> 3 attacks (handled in OnPlay)
+        DynamicVars.Cards.UpgradeValueBy(UpgradedCardCount - CardCount);
     }
 }

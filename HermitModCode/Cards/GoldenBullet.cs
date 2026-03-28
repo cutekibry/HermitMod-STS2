@@ -5,11 +5,12 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.Core.Entities.Cards;
 
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Deal 20 damage. Exhaust.
+/// Deal 20 damage. If Fatal, permanently reduce this card's cost by 1. Exhaust.
 /// Upgrade: 28 damage.
 /// </summary>
 public sealed class GoldenBullet : HermitCard
@@ -27,6 +28,14 @@ public sealed class GoldenBullet : HermitCard
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+
+        // Fatal: permanently reduce base cost by 1
+        if (play.Target?.IsDead == true)
+        {
+            int currentBase = EnergyCost.GetWithModifiers(CostModifiers.None);
+            int newCost = Math.Max(0, currentBase - 1);
+            EnergyCost.SetCustomBaseCost(newCost);
+        }
     }
 
     protected override void OnUpgrade()

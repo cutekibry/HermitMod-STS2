@@ -12,6 +12,9 @@ public static class HermitVisualBuilder
 {
     private const string CharDir = "res://HermitMod/images/char/";
 
+    // Base waist Y position — places feet near y=0 (ground level)
+    private const float WaistY = -48f;
+
     public static NCreatureVisuals Build()
     {
         var root = new NCreatureVisuals();
@@ -20,8 +23,8 @@ public static class HermitVisualBuilder
         var bounds = new Control();
         bounds.Name = "Bounds";
         bounds.UniqueNameInOwner = true;
-        bounds.Position = new Vector2(-130, -330);
-        bounds.Size = new Vector2(260, 330);
+        bounds.Position = new Vector2(-130, -260);
+        bounds.Size = new Vector2(260, 260);
         root.AddChild(bounds);
         bounds.Owner = root;
 
@@ -29,28 +32,28 @@ public static class HermitVisualBuilder
         var centerPos = new Marker2D();
         centerPos.Name = "CenterPos";
         centerPos.UniqueNameInOwner = true;
-        centerPos.Position = new Vector2(0, -165);
+        centerPos.Position = new Vector2(0, -120);
         root.AddChild(centerPos);
         centerPos.Owner = root;
 
         var orbPos = new Marker2D();
         orbPos.Name = "OrbPos";
         orbPos.UniqueNameInOwner = true;
-        orbPos.Position = new Vector2(-130, -165);
+        orbPos.Position = new Vector2(-130, -120);
         root.AddChild(orbPos);
         orbPos.Owner = root;
 
         var talkPos = new Marker2D();
         talkPos.Name = "TalkPos";
         talkPos.UniqueNameInOwner = true;
-        talkPos.Position = new Vector2(50, -300);
+        talkPos.Position = new Vector2(50, -240);
         root.AddChild(talkPos);
         talkPos.Owner = root;
 
         var intentPos = new Marker2D();
         intentPos.Name = "IntentPos";
         intentPos.UniqueNameInOwner = true;
-        intentPos.Position = new Vector2(0, -340);
+        intentPos.Position = new Vector2(0, -270);
         root.AddChild(intentPos);
         intentPos.Owner = root;
 
@@ -62,41 +65,40 @@ public static class HermitVisualBuilder
         root.AddChild(visuals);
         visuals.Owner = root;
 
-        // Shadow
-        var shadow = CreateSprite("Shadow", CharDir + "shadow.png", new Vector2(0, -12));
+        // Shadow at ground level
+        var shadow = CreateSprite("Shadow", CharDir + "shadow.png", new Vector2(0, -5));
         visuals.AddChild(shadow);
         shadow.Owner = root;
 
         // Waist (main body pivot - everything attaches here)
         var waist = new Node2D();
         waist.Name = "Waist";
-        waist.Position = new Vector2(2, -95);
+        waist.Position = new Vector2(2, WaistY);
         visuals.AddChild(waist);
         waist.Owner = root;
 
-        // Right leg (absolute in .tscn: 20,-52 → relative to waist: 18, 43)
+        // Legs (feet should land near shadow/ground)
         var rightLeg = CreateSprite("RightLeg", CharDir + "leg_right.png", new Vector2(18, 43));
         waist.AddChild(rightLeg);
         rightLeg.Owner = root;
 
-        // Left leg (absolute in .tscn: -18,-50 → relative to waist: -20, 45)
         var leftLeg = CreateSprite("LeftLeg", CharDir + "leg_left.png", new Vector2(-20, 45));
         waist.AddChild(leftLeg);
         leftLeg.Owner = root;
 
-        // Body (absolute in .tscn: 2,-100 offset 0,-50 → relative to waist: 0,-5 offset 0,-50)
+        // Body
         var body = CreateSprite("Body", CharDir + "body.png", new Vector2(0, -5));
         body.Offset = new Vector2(0, -50);
         waist.AddChild(body);
         body.Owner = root;
 
-        // Right arm (absolute in .tscn: 52,-140 → relative to waist: 50,-45)
+        // Right arm
         var rightArm = CreateSprite("RightArm", CharDir + "right_hand.png", new Vector2(50, -45));
         rightArm.Rotation = 0.264f;
         waist.AddChild(rightArm);
         rightArm.Owner = root;
 
-        // Left arm (absolute in .tscn: -48,-120 → relative to waist: -50,-25)
+        // Left arm (pivot for gun)
         var leftArm = new Node2D();
         leftArm.Name = "LeftArm";
         leftArm.Position = new Vector2(-50, -25);
@@ -121,18 +123,18 @@ public static class HermitVisualBuilder
         waist.AddChild(head);
         head.Owner = root;
 
-        var hat = CreateSprite("Hat", CharDir + "hat.png", new Vector2(-4, -18));
+        var hat = CreateSprite("Hat", CharDir + "hat.png", new Vector2(8, -40));
         head.AddChild(hat);
         hat.Owner = root;
 
-        var eye = CreateSprite("Eye", CharDir + "eye.png", new Vector2(5, 4));
+        var eye = CreateSprite("Eye", CharDir + "eye.png", new Vector2(10, -10));
         head.AddChild(eye);
         eye.Owner = root;
 
         // Corpse sprite (hidden, shown on death)
-        var corpse = CreateSprite("Corpse", CharDir + "corpse.png", new Vector2(0, -50));
+        var corpse = CreateSprite("Corpse", CharDir + "corpse.png", new Vector2(0, -20));
         corpse.Visible = false;
-        corpse.Offset = new Vector2(0, -100);
+        corpse.Offset = new Vector2(0, -30);
         visuals.AddChild(corpse);
         corpse.Owner = root;
 
@@ -193,9 +195,9 @@ public static class HermitVisualBuilder
         int t = anim.AddTrack(Animation.TrackType.Value);
         anim.TrackSetPath(t, "Visuals/Waist:position");
         anim.TrackSetInterpolationType(t, Animation.InterpolationType.Cubic);
-        anim.TrackInsertKey(t, 0f, new Vector2(2, -95));
-        anim.TrackInsertKey(t, 0.8333f, new Vector2(6.84f, -95f));
-        anim.TrackInsertKey(t, 1.6666f, new Vector2(2, -95));
+        anim.TrackInsertKey(t, 0f, new Vector2(2, WaistY));
+        anim.TrackInsertKey(t, 0.8333f, new Vector2(6.84f, WaistY));
+        anim.TrackInsertKey(t, 1.6666f, new Vector2(2, WaistY));
 
         // Head bob
         t = anim.AddTrack(Animation.TrackType.Value);
@@ -258,9 +260,9 @@ public static class HermitVisualBuilder
         int t = anim.AddTrack(Animation.TrackType.Value);
         anim.TrackSetPath(t, "Visuals/Waist:position");
         anim.TrackSetInterpolationType(t, Animation.InterpolationType.Cubic);
-        anim.TrackInsertKey(t, 0f, new Vector2(2, -95));
-        anim.TrackInsertKey(t, 0.0833f, new Vector2(-8.7f, -93.67f));
-        anim.TrackInsertKey(t, 0.5f, new Vector2(2, -95));
+        anim.TrackInsertKey(t, 0f, new Vector2(2, WaistY));
+        anim.TrackInsertKey(t, 0.0833f, new Vector2(-8.7f, WaistY + 1.33f));
+        anim.TrackInsertKey(t, 0.5f, new Vector2(2, WaistY));
 
         // Waist rotation
         t = anim.AddTrack(Animation.TrackType.Value);
@@ -307,10 +309,10 @@ public static class HermitVisualBuilder
         int t = anim.AddTrack(Animation.TrackType.Value);
         anim.TrackSetPath(t, "Visuals/Waist:position");
         anim.TrackSetInterpolationType(t, Animation.InterpolationType.Cubic);
-        anim.TrackInsertKey(t, 0f, new Vector2(2, -95));
-        anim.TrackInsertKey(t, 0.1f, new Vector2(30, -95));
-        anim.TrackInsertKey(t, 0.15f, new Vector2(40, -95));
-        anim.TrackInsertKey(t, 0.5f, new Vector2(2, -95));
+        anim.TrackInsertKey(t, 0f, new Vector2(2, WaistY));
+        anim.TrackInsertKey(t, 0.1f, new Vector2(30, WaistY));
+        anim.TrackInsertKey(t, 0.15f, new Vector2(40, WaistY));
+        anim.TrackInsertKey(t, 0.5f, new Vector2(2, WaistY));
 
         // Gun arm swings forward on attack
         t = anim.AddTrack(Animation.TrackType.Value);
@@ -351,9 +353,9 @@ public static class HermitVisualBuilder
         int t = anim.AddTrack(Animation.TrackType.Value);
         anim.TrackSetPath(t, "Visuals/Waist:position");
         anim.TrackSetInterpolationType(t, Animation.InterpolationType.Cubic);
-        anim.TrackInsertKey(t, 0f, new Vector2(2, -95));
-        anim.TrackInsertKey(t, 0.15f, new Vector2(-5, -100));
-        anim.TrackInsertKey(t, 0.6f, new Vector2(2, -95));
+        anim.TrackInsertKey(t, 0f, new Vector2(2, WaistY));
+        anim.TrackInsertKey(t, 0.15f, new Vector2(-5, WaistY - 5));
+        anim.TrackInsertKey(t, 0.6f, new Vector2(2, WaistY));
 
         // Arms raise up for cast
         t = anim.AddTrack(Animation.TrackType.Value);
@@ -394,13 +396,13 @@ public static class HermitVisualBuilder
         anim.Length = 0.8f;
         anim.LoopMode = Animation.LoopModeEnum.None;
 
-        // Collapse - waist drops
+        // Collapse - waist drops to ground
         int t = anim.AddTrack(Animation.TrackType.Value);
         anim.TrackSetPath(t, "Visuals/Waist:position");
         anim.TrackSetInterpolationType(t, Animation.InterpolationType.Cubic);
-        anim.TrackInsertKey(t, 0f, new Vector2(2, -95));
-        anim.TrackInsertKey(t, 0.4f, new Vector2(-10, -40));
-        anim.TrackInsertKey(t, 0.8f, new Vector2(-10, -40));
+        anim.TrackInsertKey(t, 0f, new Vector2(2, WaistY));
+        anim.TrackInsertKey(t, 0.4f, new Vector2(-10, 7));
+        anim.TrackInsertKey(t, 0.8f, new Vector2(-10, 7));
 
         // Waist tilts over
         t = anim.AddTrack(Animation.TrackType.Value);
