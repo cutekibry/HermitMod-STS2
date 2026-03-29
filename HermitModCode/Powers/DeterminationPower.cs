@@ -5,7 +5,7 @@ namespace HermitMod.Powers;
 
 /// <summary>
 /// Whenever a debuff is applied to you, gain X Strength.
-/// Requires Harmony patch on power application for full implementation.
+/// Implementation is in DeterminationPatches.cs via Harmony hook.
 /// </summary>
 public sealed class DeterminationPower : HermitPower
 {

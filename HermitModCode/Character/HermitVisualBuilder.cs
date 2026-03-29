@@ -46,7 +46,7 @@ public static class HermitVisualBuilder
         var talkPos = new Marker2D();
         talkPos.Name = "TalkPos";
         talkPos.UniqueNameInOwner = true;
-        talkPos.Position = new Vector2(50, -240);
+        talkPos.Position = new Vector2(60, -310);
         root.AddChild(talkPos);
         talkPos.Owner = root;
 

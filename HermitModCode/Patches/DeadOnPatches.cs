@@ -31,6 +31,13 @@ public static class DeadOnHelper
     private static bool _currentCardIsDeadOn;
     private static int _deadOnTriggersThisTurn;
 
+    /// <summary>
+    /// When true, the next card played will have Dead On forced on.
+    /// Used by Cheat card to propagate Dead On to the selected card.
+    /// Reset after the next card's Dead On check.
+    /// </summary>
+    public static bool ForceNextDeadOn { get; set; }
+
     public static bool IsDeadOn => _currentCardIsDeadOn;
     public static int DeadOnTriggersThisTurn => _deadOnTriggersThisTurn;
 
@@ -88,6 +95,14 @@ public static class DeadOnOnPlayWrapperPatch
         DeadOnHelper.SetDeadOn(false);
 
         if (__instance?.Owner == null) return;
+
+        // Check if ForceNextDeadOn was set (by Cheat card)
+        if (DeadOnHelper.ForceNextDeadOn)
+        {
+            DeadOnHelper.ForceNextDeadOn = false;
+            DeadOnHelper.SetDeadOn(true);
+            return;
+        }
 
         var owner = __instance.Owner;
 

@@ -29,15 +29,10 @@ public sealed class GoldenBullet : HermitCard
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
 
-        // Fatal: permanently reduce base cost by 1 (persists because card instances
-        // are shared between combat piles and the deck)
+        // Fatal: permanently reduce cost by 1
         if (play.Target?.IsDead == true)
         {
-            int currentCost = EnergyCost.GetWithModifiers(CostModifiers.None);
-            if (currentCost > 0)
-            {
-                EnergyCost.SetCustomBaseCost(currentCost - 1);
-            }
+            EnergyCost.UpgradeBy(-1);
         }
     }
 

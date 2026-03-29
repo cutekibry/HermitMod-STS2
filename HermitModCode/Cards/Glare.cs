@@ -25,6 +25,9 @@ public sealed class Glare : HermitCard
         await PowerCmd.Apply<VulnerablePower>(play.Target, DynamicVars["WeakPower"].BaseValue, Owner.Creature, this);
     }
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        IsUpgraded ? [CardKeyword.Retain] : [];
+
     protected override void OnUpgrade()
     {
         DynamicVars["WeakPower"].UpgradeValueBy(1m);

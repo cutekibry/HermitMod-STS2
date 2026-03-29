@@ -17,16 +17,36 @@ public sealed class LuckOfTheDraw : HermitCard
 
     public LuckOfTheDraw() : base(1, CardType.Skill, CardRarity.Rare, TargetType.Self) { }
 
+    private int Threshold => IsUpgraded ? UpgradedCostThreshold : CostThreshold;
+
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
-        // Simplified: draw 3 cards (or 4 upgraded)
-        await CardPileCmd.Draw(ctx, CostThreshold, Owner, false);
+        int totalCost = 0;
+        var drawPile = PileType.Draw.GetPile(Owner);
+
+        while (totalCost < Threshold && drawPile != null && drawPile.Cards.Count > 0)
+        {
+            int handBefore = PileType.Hand.GetPile(Owner)?.Cards.Count ?? 0;
+            await CardPileCmd.Draw(ctx, 1, Owner, false);
+            int handAfter = PileType.Hand.GetPile(Owner)?.Cards.Count ?? 0;
+
+            if (handAfter <= handBefore) break;
+
+            var hand = PileType.Hand.GetPile(Owner);
+            if (hand != null && hand.Cards.Count > 0)
+            {
+                var lastCard = hand.Cards[^1];
+                int cardCost = lastCard.EnergyCost.GetWithModifiers(CostModifiers.None);
+                totalCost += cardCost;
+            }
+        }
     }
 
     protected override void OnUpgrade()
     {
-        // 3 -> 4 cost threshold (handled in OnPlay)
+        // Upgrade changes threshold from 3 to 4 (reflected in description)
+        EnergyCost.UpgradeBy(0); // Force description refresh
     }
 }
