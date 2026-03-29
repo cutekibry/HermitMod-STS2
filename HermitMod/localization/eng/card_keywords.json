@@ -1,6 +1,8 @@
 {
   "HERMITMOD-DEAD_ON.title": "Dead On",
   "HERMITMOD-DEAD_ON.description": "Dead On cards have a bonus effect when in the middle of your hand.",
+  "HERMITMOD-DEADON.title": "Dead On",
+  "HERMITMOD-DEADON.description": "Dead On cards have a bonus effect when in the middle of your hand.",
   "HERMITMOD-CONCENTRATE.title": "Concentrate",
   "HERMITMOD-CONCENTRATE.description": "The next Dead On card played while Concentrated triggers its effect regardless of position. Wears off on turn end.",
   "HERMITMOD-BRUISE.title": "Bruise",

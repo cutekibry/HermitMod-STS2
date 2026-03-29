@@ -45,6 +45,6 @@ public sealed class Vantage : HermitCard
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Cards.UpgradeValueBy(UpgradedDrawUpgradeCount - DrawUpgradeCount);
+        // Upgrade changes draw count from 1 to 2 (reflected in upgradeDescription)
     }
 }

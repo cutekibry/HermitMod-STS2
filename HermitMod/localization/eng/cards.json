@@ -88,6 +88,7 @@
   "HERMITMOD-CHEAT.selectionScreenPrompt": "Choose a card to play.",
   "HERMITMOD-VANTAGE.title": "Vantage",
   "HERMITMOD-VANTAGE.description": "Gain {Block:diff()} Block.\n[gold]Dead On[/gold]: Draw and Upgrade a card.",
+  "HERMITMOD-VANTAGE.upgradeDescription": "Gain {Block:diff()} Block.\n[gold]Dead On[/gold]: Draw and Upgrade 2 cards.",
   "HERMITMOD-BRAWL.title": "Brawl",
   "HERMITMOD-BRAWL.description": "At the start of your turn, apply {BruisePower:diff()} [gold]Bruise[/gold] to ALL enemies.",
   "HERMITMOD-COMBO.title": "Combo",
