@@ -7,11 +7,14 @@ namespace HermitMod.Powers;
 
 public abstract class HermitPower : CustomPowerModel
 {
+    private string IconFileName =>
+        Id.Entry.RemovePrefix().ToLowerInvariant().Replace("_", "") + ".png";
+
     public override string? CustomPackedIconPath
     {
         get
         {
-            var path = $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".PowerImagePath();
+            var path = IconFileName.PowerImagePath();
             return ResourceLoader.Exists(path) ? path : "concentration.png".PowerImagePath();
         }
     }
@@ -20,7 +23,7 @@ public abstract class HermitPower : CustomPowerModel
     {
         get
         {
-            var path = $"{Id.Entry.RemovePrefix().ToLowerInvariant()}.png".BigPowerImagePath();
+            var path = IconFileName.BigPowerImagePath();
             return ResourceLoader.Exists(path) ? path : "concentration.png".BigPowerImagePath();
         }
     }
