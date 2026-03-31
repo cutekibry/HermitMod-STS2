@@ -33,6 +33,6 @@ public sealed class Glare : HermitCard
 
     protected override void OnUpgrade()
     {
-        // Upgrade only adds Retain (handled by CanonicalKeywords), no stat change
+        DynamicVars["WeakPower"].UpgradeValueBy(1m);
     }
 }
