@@ -1,31 +1,31 @@
 using HermitMod.Cards;
+using HermitMod.Patches;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Gain 5 Block. Draw 1 card.
-/// Upgrade: 8 Block, Draw 2.
+/// Gain 12 Block. Dead On: Gain 5 Gold. Exhaust.
+/// Upgrade: 15 Block, 10 Gold.
+/// (Original STS1: Plated Armor 4/5. Adapted to Block since Plated Armor doesn't exist in STS2.)
 /// </summary>
 public sealed class Scavenge : HermitCard
 {
-    private const int BlockAmount = 5;
-    private const int UpgradedBlockAmount = 8;
-    private const int DrawAmount = 1;
-    private const int UpgradedDrawAmount = 2;
+    public override bool HasDeadOn => true;
+
+    private const int BlockAmount = 12;
+    private const int UpgradedBlockAmount = 15;
+    private const int GoldAmount = 5;
+    private const int UpgradedGoldAmount = 10;
 
     public Scavenge() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new BlockVar((decimal)BlockAmount, ValueProp.Move),
-        new CardsVar(DrawAmount)
-    ];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)BlockAmount, ValueProp.Move)];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
@@ -33,12 +33,17 @@ public sealed class Scavenge : HermitCard
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
-        await CardPileCmd.Draw(ctx, DynamicVars.Cards.IntValue, Owner, false);
+
+        if (DeadOnHelper.IsDeadOn)
+        {
+            DeadOnHelper.IncrementDeadOnCount();
+            int gold = IsUpgraded ? UpgradedGoldAmount : GoldAmount;
+            await PlayerCmd.GainGold(gold, Owner);
+        }
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Block.UpgradeValueBy(UpgradedBlockAmount - BlockAmount);
-        DynamicVars.Cards.UpgradeValueBy(UpgradedDrawAmount - DrawAmount);
     }
 }

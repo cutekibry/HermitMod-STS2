@@ -4,6 +4,7 @@ using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 
@@ -16,13 +17,15 @@ namespace HermitMod.Cards;
 public sealed class Horror : HermitCard
 {
     private const int BruiseAmount = 3;
-    private const int UpgradedBruiseAmount = 4;
+    private const int UpgradedBruiseAmount = 5;
 
-    public Horror() : base(1, CardType.Skill, CardRarity.Common, TargetType.AllEnemies) { }
+    public Horror() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.AllEnemies) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<BruisePower>((decimal)BruiseAmount)];
 
     protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Bruise];
+
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<HorrorPower>()];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {

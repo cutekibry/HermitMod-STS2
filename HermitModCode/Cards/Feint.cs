@@ -10,10 +10,10 @@ using MegaCrit.Sts2.Core.Models;
 
 namespace HermitMod.Cards;
 
-public class Feint() : HermitCard(1, CardType.Skill, CardRarity.Common, TargetType.Self)
+public class Feint() : HermitCard(0, CardType.Skill, CardRarity.Common, TargetType.Self)
 {
-    private const int Blk = 6;
-    private const int UpgradeBlk = 3;
+    private const int Blk = 3;
+    private const int UpgradeBlk = 2;
     private const int BruiseAmt = 2;
     private const int UpgradedBruiseAmt = 3;
 

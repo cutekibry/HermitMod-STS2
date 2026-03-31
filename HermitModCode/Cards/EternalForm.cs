@@ -2,6 +2,7 @@ using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 
 namespace HermitMod.Cards;
@@ -14,6 +15,11 @@ public sealed class EternalForm : HermitCard
 {
     public EternalForm() : base(3, CardType.Power, CardRarity.Rare, TargetType.Self) { }
 
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        IsUpgraded ? [] : [CardKeyword.Ethereal];
+
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<EternalPower>()];
+
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
@@ -22,6 +28,6 @@ public sealed class EternalForm : HermitCard
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        // Upgrade removes Ethereal (handled by CanonicalKeywords)
     }
 }

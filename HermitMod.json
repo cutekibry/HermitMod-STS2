@@ -3,7 +3,7 @@
   "name": "The Hermit",
   "author": "Hermit Mod Team (Ported to STS2)",
   "description": "The Hermit - a gunslinger character with Dead On hand-position mechanics, Bruise debuffs, and curse synergy. Ported from Slay the Spire 1.",
-  "version": "v1.0.0",
+  "version": "v0.1.9",
   "has_pck": true,
   "has_dll": true,
   "dependencies": ["BaseLib"],

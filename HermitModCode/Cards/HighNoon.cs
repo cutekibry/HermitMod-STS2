@@ -3,6 +3,7 @@ using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 
 namespace HermitMod.Cards;
@@ -13,7 +14,9 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class HighNoon : HermitCard
 {
-    public HighNoon() : base(2, CardType.Power, CardRarity.Rare, TargetType.None) { }
+    public HighNoon() : base(1, CardType.Power, CardRarity.Rare, TargetType.None) { }
+
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<HighNoonPower>()];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
@@ -23,7 +26,7 @@ public sealed class HighNoon : HermitCard
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        EnergyCost.UpgradeBy(-1);  // 1 → 0
         EnergyCost.FinalizeUpgrade();
     }
 }

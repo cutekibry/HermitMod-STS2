@@ -1,0 +1,86 @@
+The Hermit v0.1.9 - Community Contributor Update
+
+This is a major update incorporating community contributions and fixing a large number of gameplay bugs. Huge thanks to everyone who has been testing, reporting issues, and contributing directly to the mod.
+
+---
+
+CONTRIBUTOR CREDITS
+
+A massive thank you to KenCagg90, who implemented a huge set of improvements that dramatically improve the look and feel of The Hermit:
+- Spine-based combat character model (replacing the old sprite-based visual)
+- Custom sound effects: gunshots, spin, reload, and character select sounds
+- Custom energy orb with animated layers
+- Merchant scene character model
+- Updated character select portrait and in-game icon
+- Death animation with fade effect and corpse sprite
+- Character attack tilt animation
+
+Thank you to GoofballyMcgee for creating the hand-drawn multiplayer arm image assets:
+- Pointing arm (relic selection)
+- Rock, Paper, and Scissors arms (for the multiplayer mini-game)
+
+---
+
+NEW FEATURES (via KenCagg90)
+
+- Spine-based character model with smooth animations in combat
+- Six custom sound effects integrated into card play (gunshots on attacks, spin/reload on skills)
+- Animated custom energy orb
+- Custom Hermit merchant scene
+- Multiplayer arm textures for relic selection and rock-paper-scissors (art by GoofballyMcgee)
+
+---
+
+BUG FIXES
+
+Visual / Scene Fixes:
+- Fixed combat softlock (black screen when entering combat) caused by missing scene files in the resource pack
+- Fixed The Hermit not appearing in the merchant scene
+- Fixed character select portrait still showing placeholder art instead of the updated portrait
+- Fixed in-game character icon (top-left corner) showing the old placeholder icon
+
+Card Fixes:
+- Fixed Final Canter: changed rarity from Uncommon to Rare (matching STS1), and the card now correctly deals bonus damage per Curse in all piles (+3 base, +4 upgraded) -- thanks metacusa
+- Fixed Gestalt upgrade: Vulnerable now correctly reduces from 2 to 1 on upgrade, while Rugged stays at 2 (was incorrectly reducing both) -- thanks steve1316
+- Fixed Dead Or Alive: killing an enemy now correctly grants gold (15 base, 25 upgraded) and tracks it via Bounty -- thanks metacusa
+- Fixed Luck of the Draw: the card now properly triggers a reshuffle from discard pile when the draw pile runs out mid-effect, instead of stopping early -- thanks Dartblue
+- Fixed Flash Powder: base card now correctly removes 2 Strength (was only removing 1). Upgrade now adds Block (5 base, 8 upgraded) instead of increasing Strength loss -- thanks metacusa
+- Fixed Cheat: the card now draws top 3 (5 upgraded) cards to hand and lets you choose one to play, instead of acting as a single draw. Dead On correctly chains to the chosen card -- thanks metacusa
+- Fixed Coalescence: retain selection now works correctly during card play. Choose up to 2 (3 upgraded) cards from hand to retain this turn -- thanks metacusa
+- Fixed Low Profile: bonus Block per debuff on the owner now applies correctly -- thanks Condomknight
+- Fixed Spray and Pray: now correctly hits a random enemy per hit (not all enemies), and properly shuffles a Doubt into the draw pile -- thanks berseker2111
+- Fixed Cursed Weapon: damage now correctly scales permanently each time you play a Curse -- thanks gigaflairman
+
+Power Fixes:
+- Fixed Determination: "Whenever a debuff is applied to you, gain X Strength" now correctly triggers on any debuff application, not just the power's own changes -- thanks metacusa
+
+Card Pool / Reward Fixes:
+- Fixed Memento, Snapshot, and other Basic-rarity cards appearing in card rewards and Discovery. Basic cards are now properly filtered from the Hermit card pool -- thanks metacusa
+
+Stability Fixes:
+- Fixed DustyTome softlock: added a Harmony patch to prevent NullReferenceException when The Hermit encounters the DustyTome relic (which expects base-game character properties) -- thanks Darv
+- Fixed epoch progression crash: added null safety checks to elite and boss epoch tracking to prevent NullReferenceException when progress data is unavailable -- thanks metacusa
+
+---
+
+KNOWN ISSUES
+
+- The Wsdx233 variant of the game uses a different mod loading system and is not currently supported. The mod requires the official Steam version with BaseLib.
+- Discovery may generate empty choices if the card pool is fully exhausted after many uses in a single combat. This is rare and non-blocking (you can cancel the selection).
+
+---
+
+FULL BUG REPORTER CREDITS
+
+Thank you to everyone who took the time to report bugs -- your reports are what make the mod better:
+- steve1316 -- Gestalt Vulnerable/Rugged issues, Horror + Bruise interaction
+- metacusa -- Final Canter rarity/Curse scaling, Dead Or Alive gold, Determination, Discovery, Flash Powder, Cheat, Coalescence, Snapshot issues, epoch progression
+- Dartblue -- Luck of the Draw reshuffle issue, Wsdx233 compatibility report
+- Darv -- DustyTome combat softlock
+- Condomknight -- Low Profile bonus Block not applying
+- berseker2111 -- Spray and Pray targeting and Doubt shuffle issues
+- gigaflairman -- Cursed Weapon not scaling, post-combat softlock with Lost Coffer
+- SOSolacex -- Card reward display issues
+- Pukkage -- ReflectionTypeLoadException on stable branch
+
+Keep the reports coming -- every bug you find helps us get The Hermit closer to a polished release.

@@ -11,10 +11,11 @@ namespace HermitMod.Cards;
 
 /// <summary>
 /// Concentrate. Gain 3 Energy. Exhaust.
+/// Upgrade: Cost reduced from 1 to 0.
 /// </summary>
 public sealed class EyeOfTheStorm : HermitCard
 {
-    public EyeOfTheStorm() : base(0, CardType.Skill, CardRarity.Rare, TargetType.None) { }
+    public EyeOfTheStorm() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
@@ -31,6 +32,7 @@ public sealed class EyeOfTheStorm : HermitCard
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Energy.UpgradeValueBy(1);
+        EnergyCost.UpgradeBy(-1); // 1 → 0
+        EnergyCost.FinalizeUpgrade();
     }
 }

@@ -12,15 +12,14 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Gain 6 Block. ALL enemies lose 2 Strength. Exhaust.
-/// Upgrade: 9 Block, lose 3 Strength.
+/// Gain 5 Block. ALL enemies lose 1 Strength. Exhaust.
+/// Upgrade: ALL enemies lose 2 Strength.
 /// </summary>
 public sealed class FlashPowder : HermitCard
 {
-    private const int BlockAmount = 6;
-    private const int UpgradedBlockAmount = 9;
+    private const int BlockAmount = 5;
+    private const int UpgradedBlockAmount = 8;
     private const int StrengthLoss = 2;
-    private const int UpgradedStrengthLoss = 3;
 
     public FlashPowder() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
@@ -30,8 +29,6 @@ public sealed class FlashPowder : HermitCard
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<StrengthPower>()];
 
-    private int CurrentStrengthLoss => IsUpgraded ? UpgradedStrengthLoss : StrengthLoss;
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
@@ -39,7 +36,7 @@ public sealed class FlashPowder : HermitCard
 
         foreach (Creature enemy in CombatState.HittableEnemies)
         {
-            await PowerCmd.Apply<StrengthPower>(enemy, -CurrentStrengthLoss, Owner.Creature, this);
+            await PowerCmd.Apply<StrengthPower>(enemy, -StrengthLoss, Owner.Creature, this);
         }
     }
 

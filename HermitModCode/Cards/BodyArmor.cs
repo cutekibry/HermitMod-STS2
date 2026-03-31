@@ -15,8 +15,8 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class BodyArmor : HermitCard
 {
-    private const int Blk = 7;
-    private const int UpgradeBlk = 3;
+    private const int Blk = 5;
+    private const int UpgradeBlk = 2;
 
     public BodyArmor() : base(1, CardType.Skill, CardRarity.Common, TargetType.None) { }
 

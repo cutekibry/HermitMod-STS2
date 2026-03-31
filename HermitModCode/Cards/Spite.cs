@@ -14,12 +14,12 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class Spite : HermitCard
 {
-    private const int BlockAmount = 7;
-    private const int UpgradedBlockAmount = 10;
-    private const int DrawAmount = 1;
-    private const int UpgradedDrawAmount = 2;
+    private const int BlockAmount = 8;
+    private const int UpgradedBlockAmount = 8;
+    private const int DrawAmount = 3;
+    private const int UpgradedDrawAmount = 4;
 
-    public Spite() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
+    public Spite() : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)BlockAmount, ValueProp.Move), new CardsVar(DrawAmount)];
 

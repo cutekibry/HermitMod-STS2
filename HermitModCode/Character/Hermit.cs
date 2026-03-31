@@ -2,12 +2,10 @@ using BaseLib.Abstracts;
 using HermitMod.Cards;
 using HermitMod.Extensions;
 using HermitMod.Relics;
+using HermitMod.Utility;
 using Godot;
 using MegaCrit.Sts2.Core.Entities.Characters;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Cards;
-using MegaCrit.Sts2.Core.Models.Relics;
-using MegaCrit.Sts2.Core.Nodes.Combat;
 
 namespace HermitMod.Character;
 
@@ -15,9 +13,13 @@ public class Hermit : PlaceholderCharacterModel
 {
     public const string CharacterId = "HermitMod";
 
-    public static readonly Color Color = new("6B3A6B"); // Dark purple/mauve
+    public static readonly Color Color = new("9e6a34");
+    public static readonly Color CardBackColor = new("edd4b8");
 
     public override Color NameColor => Color;
+    public override Color MapDrawingColor => Color;
+    public override Color RemoteTargetingLineColor => new("9e6a34ff");
+    public override Color RemoteTargetingLineOutline => new("5a3d20ff");
     public override CharacterGender Gender => CharacterGender.Neutral;
     public override int StartingHp => 70;
     public override int StartingGold => 99;
@@ -45,14 +47,14 @@ public class Hermit : PlaceholderCharacterModel
     public override RelicPoolModel RelicPool => ModelDb.RelicPool<HermitRelicPool>();
     public override PotionPoolModel PotionPool => ModelDb.PotionPool<HermitPotionPool>();
 
-    // Character select background (full portrait)
+    // Character select background
     public override string CustomCharacterSelectBg => "res://HermitMod/scenes/hermit_select_bg.tscn";
 
     // Character select button icon
     public override string CustomCharacterSelectIconPath => "HermitButton.png".CharacterUiPath();
     public override string CustomCharacterSelectLockedIconPath => "HermitButton.png".CharacterUiPath();
 
-    // In-game UI icon (top-left corner, built programmatically)
+    // In-game UI icon
     public override Control? CustomIcon
     {
         get
@@ -79,18 +81,25 @@ public class Hermit : PlaceholderCharacterModel
 
     // Multiplayer arm textures (relic selection / rock-paper-scissors)
     public override string? CustomArmPointingTexturePath => "hermit_arm_point.png".CharacterUiPath();
-    public override string? CustomArmRockTexturePath => "hermit_arm_point.png".CharacterUiPath();
-    public override string? CustomArmPaperTexturePath => "hermit_arm_point.png".CharacterUiPath();
-    public override string? CustomArmScissorsTexturePath => "hermit_arm_point.png".CharacterUiPath();
+    public override string? CustomArmRockTexturePath => "hermit_arm_rock.png".CharacterUiPath();
+    public override string? CustomArmPaperTexturePath => "hermit_arm_paper.png".CharacterUiPath();
+    public override string? CustomArmScissorsTexturePath => "hermit_arm_scissors.png".CharacterUiPath();
 
-    // Sound effects — use crossbow sound as gun placeholder
+    // Sound effects
+    public override string CharacterSelectSfx
+    {
+        get
+        {
+            ModAudio.PlayGlobalSfx("hermit_select", 5f);
+            return "";
+        }
+    }
     public override string CharacterTransitionSfx => "event:/sfx/ui/wipe_ironclad";
     public override string? CustomAttackSfx => "event:/sfx/enemy/enemy_attacks/crossbow_ruby_raider/crossbow_ruby_raider_reload";
     public override string? CustomCastSfx => null;
 
-    // Build the combat visual programmatically with animated body parts
-    public override NCreatureVisuals? CreateCustomVisuals()
-    {
-        return HermitVisualBuilder.Build();
-    }
+    // Spine-based creature visual, energy counter, and merchant
+    public override string CustomVisualPath => "res://HermitMod/scenes/creature_visuals/hermit.tscn";
+    public override string? CustomEnergyCounterPath => "res://HermitMod/scenes/combat/energy_counters/hermit_energy_counter.tscn";
+    public override string CustomMerchantAnimPath => "res://HermitMod/scenes/merchant/characters/hermit_merchant.tscn";
 }

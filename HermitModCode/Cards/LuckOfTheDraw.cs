@@ -15,7 +15,7 @@ public sealed class LuckOfTheDraw : HermitCard
     private const int CostThreshold = 3;
     private const int UpgradedCostThreshold = 4;
 
-    public LuckOfTheDraw() : base(1, CardType.Skill, CardRarity.Rare, TargetType.Self) { }
+    public LuckOfTheDraw() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.Self) { }
 
     private int Threshold => IsUpgraded ? UpgradedCostThreshold : CostThreshold;
 
@@ -26,7 +26,7 @@ public sealed class LuckOfTheDraw : HermitCard
         int totalCost = 0;
         var drawPile = PileType.Draw.GetPile(Owner);
 
-        while (totalCost < Threshold && drawPile != null && drawPile.Cards.Count > 0)
+        while (totalCost < Threshold)
         {
             int handBefore = PileType.Hand.GetPile(Owner)?.Cards.Count ?? 0;
             await CardPileCmd.Draw(ctx, 1, Owner, false);

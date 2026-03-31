@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Patches;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -18,7 +19,7 @@ public sealed class Snapshot : HermitCard
     public override bool HasDeadOn => true;
 
     private const int DamageAmount = 6;
-    private const int UpgradedDamageAmount = 9;
+    private const int UpgradedDamageAmount = 8;
 
     public Snapshot() : base(1, CardType.Attack, CardRarity.Basic, TargetType.AnyEnemy) { }
 
@@ -27,6 +28,7 @@ public sealed class Snapshot : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
+        HermitSfx.PlayGun1();
 
         // Record target HP before attack to calculate unblocked damage
         int hpBefore = play.Target?.CurrentHp ?? 0;
@@ -34,6 +36,7 @@ public sealed class Snapshot : HermitCard
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .Targeting(play.Target)
+            .WithHermitGunHitFx()
             .Execute(ctx);
 
         if (DeadOnHelper.IsDeadOn && play.Target != null)

@@ -1,4 +1,5 @@
 using HermitMod.Cards;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -18,8 +19,7 @@ public sealed class BlackWind : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(0m, ValueProp.Move)];
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        IsUpgraded ? [CardKeyword.Exhaust] : [CardKeyword.Exhaust, CardKeyword.Ethereal];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Ethereal, CardKeyword.Exhaust];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
@@ -28,8 +28,13 @@ public sealed class BlackWind : HermitCard
         await DamageCmd.Attack(missingHp)
             .FromCard(this)
             .Targeting(play.Target)
+            .WithHermitFireHitFx()
             .Execute(ctx);
     }
 
-    protected override void OnUpgrade() { }
+    protected override void OnUpgrade()
+    {
+        EnergyCost.UpgradeBy(-1); // 2 → 1
+        EnergyCost.FinalizeUpgrade();
+    }
 }

@@ -10,33 +10,34 @@ using MegaCrit.Sts2.Core.Models;
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Gain 2 Rugged. Increase the cost of this card by 1 this combat.
-/// Upgrade: Gain 3 Rugged.
+/// Ethereal. Gain 1 Rugged. Reduce this card's cost by 2 this combat.
+/// Upgrade: Reduce cost by 1 instead.
 /// </summary>
 public sealed class HeroicBravado : HermitCard
 {
-    private const int RuggedAmt = 2;
-    private const int UpgradedRuggedAmt = 3;
+    private const int CostReduction = 2;
+    private const int UpgradedCostReduction = 1;
 
-    public HeroicBravado() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
+    public HeroicBravado() : base(1, CardType.Skill, CardRarity.Rare, TargetType.None) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<RuggedPower>((decimal)RuggedAmt)];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Ethereal];
 
     protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Rugged];
-
-    private int CurrentRugged => IsUpgraded ? UpgradedRuggedAmt : RuggedAmt;
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<RuggedPower>(Owner.Creature, CurrentRugged, Owner.Creature, this);
 
-        // Increase cost by 1 for the rest of combat
-        EnergyCost.SetCustomBaseCost(EnergyCost.GetWithModifiers(default) + 1);
+        // Reduce this card's cost for rest of combat
+        int reduction = IsUpgraded ? UpgradedCostReduction : CostReduction;
+        var newCost = Math.Max(0, (int)EnergyCost.GetWithModifiers(default) - reduction);
+        EnergyCost.SetCustomBaseCost(newCost);
+
+        await PowerCmd.Apply<RuggedPower>(Owner.Creature, 1, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["RuggedPower"].UpgradeValueBy(UpgradedRuggedAmt - RuggedAmt);
+        // Upgrade reduces cost reduction from 2 to 1 (handled in OnPlay)
     }
 }

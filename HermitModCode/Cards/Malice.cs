@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Character;
+using HermitMod.Utility;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -32,6 +33,7 @@ public sealed class Malice : HermitCard
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .TargetingAllOpponents(CombatState)
+            .WithHermitFireHitFx()
             .Execute(ctx);
 
         foreach (var enemy in CombatState.HittableEnemies)

@@ -3,13 +3,20 @@ using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace HermitMod.Cards;
 
 public sealed class Determination : HermitCard
 {
-    public Determination() : base(1, CardType.Power, CardRarity.Rare, TargetType.None) { }
+    public Determination() : base(1, CardType.Power, CardRarity.Uncommon, TargetType.None) { }
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        IsUpgraded ? [CardKeyword.Innate] : [];
+
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<StrengthPower>()];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
@@ -19,6 +26,6 @@ public sealed class Determination : HermitCard
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        // Upgrade adds Innate (handled by CanonicalKeywords)
     }
 }

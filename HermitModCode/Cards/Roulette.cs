@@ -1,4 +1,5 @@
 using HermitMod.Cards;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -9,23 +10,38 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Deal 8 damage. Draw 2 cards.
-/// Upgrade: 11 damage, Draw 3.
+/// Deal 16 damage. Discard your hand. Draw that many cards.
+/// Upgrade: 20 damage.
 /// </summary>
 public sealed class Roulette : HermitCard
 {
-    private const int DamageAmount = 8;
-    private const int UpgradedDamageAmount = 11;
+    private const int DamageAmount = 16;
+    private const int UpgradedDamageAmount = 20;
 
-    public Roulette() : base(1, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
+    public Roulette() : base(2, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
+        HermitSfx.PlaySpin();
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
-        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
-        await CardPileCmd.Draw(ctx, 2, Owner, false);
+        HermitSfx.PlayGun2();
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitGunHitFx().Execute(ctx);
+
+        // Count cards in hand, discard them all, then draw that many
+        var hand = PileType.Hand.GetPile(Owner);
+        int handSize = hand?.Cards.Count ?? 0;
+
+        if (handSize > 0)
+        {
+            var cardsToDiscard = hand!.Cards.ToList();
+            foreach (var card in cardsToDiscard)
+            {
+                await CardCmd.Discard(ctx, card);
+            }
+            await CardPileCmd.Draw(ctx, handSize, Owner, false);
+        }
     }
 
     protected override void OnUpgrade()

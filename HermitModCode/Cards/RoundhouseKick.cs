@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Character;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -15,8 +16,8 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class RoundhouseKick : HermitCard
 {
-    private const int DamageAmount = 15;
-    private const int UpgradedDamageAmount = 20;
+    private const int DamageAmount = 13;
+    private const int UpgradedDamageAmount = 18;
 
     public RoundhouseKick() : base(2, CardType.Attack, CardRarity.Rare, TargetType.AllEnemies) { }
 
@@ -32,6 +33,7 @@ public sealed class RoundhouseKick : HermitCard
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .TargetingAllOpponents(CombatState)
+            .WithHermitBluntHeavyHitFx()
             .Execute(ctx);
 
         // Stun enemies that don't intend to attack

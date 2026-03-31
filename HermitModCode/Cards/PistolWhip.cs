@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Character;
+using HermitMod.Utility;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -14,8 +15,8 @@ public class PistolWhip() : HermitCard(1, CardType.Attack, CardRarity.Common, Ta
 {
     private const int Dmg = 6;
     private const int UpgradeDmg = 3;
-    private const int BruiseAmt = 2;
-    private const int UpgradedBruiseAmt = 3;
+    private const int BruiseAmt = 3;
+    private const int UpgradedBruiseAmt = 5;
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)Dmg, ValueProp.Move), new PowerVar<BruisePower>((decimal)BruiseAmt)];
 
@@ -26,7 +27,7 @@ public class PistolWhip() : HermitCard(1, CardType.Attack, CardRarity.Common, Ta
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
-        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitBluntLightHitFx().Execute(ctx);
         await PowerCmd.Apply<BruisePower>(play.Target, CurrentBruise, Owner.Creature, this);
     }
 

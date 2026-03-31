@@ -1,4 +1,5 @@
 using HermitMod.Cards;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -10,47 +11,42 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace HermitMod.Cards;
 
 /// <summary>
-/// For each card in your exhaust pile, a random enemy loses 10 HP. Exhaust.
-/// Upgrade: 15 HP per card.
+/// For each card in your exhaust pile, a random enemy loses 5 HP.
+/// Upgrade: 7 HP per card.
 /// </summary>
 public sealed class FromBeyond : HermitCard
 {
-    private const int DamageAmount = 10;
-    private const int UpgradedDamageAmount = 15;
+    private const int HpLossAmount = 5;
+    private const int UpgradedHpLossAmount = 7;
 
-    public FromBeyond() : base(2, CardType.Attack, CardRarity.Rare, TargetType.AllEnemies) { }
+    public FromBeyond() : base(1, CardType.Skill, CardRarity.Rare, TargetType.None) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
-
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new HpLossVar(HpLossAmount)];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
-        await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
+        await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
-        // Count cards in exhaust pile
         var exhaustPile = PileType.Exhaust.GetPile(Owner);
         int exhaustCount = exhaustPile?.Cards.Count ?? 0;
 
-        // For each exhausted card, a random enemy loses HP
+        int hpLoss = IsUpgraded ? UpgradedHpLossAmount : HpLossAmount;
         var rng = new System.Random();
+
         for (int i = 0; i < exhaustCount; i++)
         {
             var enemies = CombatState.HittableEnemies;
             if (enemies.Count == 0) break;
 
-            var randomIndex = rng.Next(enemies.Count);
-            var target = enemies[randomIndex];
-
-            await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
-                .FromCard(this)
-                .Targeting(target)
-                .Execute(ctx);
+            var target = enemies[rng.Next(enemies.Count)];
+            HermitCombatFx.GroundFireOnTarget(target);
+            await CreatureCmd.Damage(ctx, target, hpLoss,
+                ValueProp.Unblockable | ValueProp.Unpowered, Owner.Creature, null);
         }
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(UpgradedDamageAmount - DamageAmount);
+        DynamicVars["HpLoss"].UpgradeValueBy(UpgradedHpLossAmount - HpLossAmount);
     }
 }

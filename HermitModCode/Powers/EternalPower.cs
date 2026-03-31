@@ -28,6 +28,9 @@ public sealed class EternalPower : HermitPower
         if (_cardsReducedThisTurn >= 4) return Task.CompletedTask;
         if (card.EnergyCost.CostsX) return Task.CompletedTask;
 
+        // Only reduce cost for cards owned by this power's owner (fixes multiplayer)
+        if (card.Owner != Owner.Player) return Task.CompletedTask;
+
         // Reduce cost by Amount (power stacks) this turn
         card.EnergyCost.AddThisTurnOrUntilPlayed(-Amount, reduceOnly: true);
         _cardsReducedThisTurn++;

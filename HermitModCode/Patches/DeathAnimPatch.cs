@@ -1,28 +1,37 @@
+using System;
+using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 
 namespace HermitMod.Patches;
 
 /// <summary>
-/// Ensures the death animation plays for custom (non-Spine) visuals.
-/// The base game only calls SetAnimationTrigger("Dead") when _spineAnimator != null,
-/// so custom visuals using a Godot AnimationPlayer never get the death trigger.
-/// This patch calls SetAnimationTrigger("Dead") for non-Spine creatures.
-/// BaseLib's CustomAnimationPatch then translates that trigger into AnimationPlayer.Play("die").
+/// Fades out the character visuals and shows a corpse sprite on death.
 /// </summary>
-[HarmonyPatch(typeof(NCreature), nameof(NCreature.StartDeathAnim))]
+[HarmonyPatch(typeof(NCreature), "StartDeathAnim")]
 public static class DeathAnimPatch
 {
     [HarmonyPostfix]
     public static void Postfix(NCreature __instance)
     {
-        // Only trigger for non-Spine creatures (custom visuals)
-        // Spine creatures already get the death animation from the original method
-        if (__instance.HasSpineAnimation)
+        Node val = ((Node)__instance).FindChild("Corpse", true, false);
+        Sprite2D corpseSprite = (Sprite2D)(object)((val is Sprite2D) ? val : null);
+        if (corpseSprite == null)
             return;
 
-        // Trigger the death animation — BaseLib's CustomAnimationPatch
-        // will intercept this and play "die" on the AnimationPlayer
-        __instance.SetAnimationTrigger("Dead");
+        Node val2 = ((Node)__instance).FindChild("Visuals", true, false);
+        Node2D visualsNode = (Node2D)(object)((val2 is Node2D) ? val2 : null);
+        if (visualsNode != null)
+        {
+            Tween tween = ((Node)__instance).CreateTween();
+            tween.TweenProperty((GodotObject)(object)visualsNode, new NodePath("modulate:a"), Variant.From(0f), 0.5);
+            tween.TweenCallback(Callable.From((Action)delegate
+            {
+                ((CanvasItem)visualsNode).Visible = false;
+                ((CanvasItem)corpseSprite).Visible = true;
+                ((CanvasItem)corpseSprite).Modulate = new Color(1f, 1f, 1f, 0f);
+            }));
+            tween.TweenProperty((GodotObject)(object)corpseSprite, new NodePath("modulate:a"), Variant.From(1f), 0.30000001192092896);
+        }
     }
 }

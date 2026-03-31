@@ -1,4 +1,5 @@
 using HermitMod.Cards;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -15,10 +16,10 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class GoldenBullet : HermitCard
 {
-    private const int DamageAmount = 20;
-    private const int UpgradedDamageAmount = 28;
+    private const int DamageAmount = 18;
+    private const int UpgradedDamageAmount = 24;
 
-    public GoldenBullet() : base(2, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy) { }
+    public GoldenBullet() : base(3, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
 
@@ -27,13 +28,21 @@ public sealed class GoldenBullet : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
-        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+        HermitSfx.PlayGun1();
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitGunHitFx().Execute(ctx);
 
-        // Fatal: permanently reduce cost by 1
+        // Fatal: permanently reduce cost by 1 (synced to deck version so it persists across combats)
         if (play.Target?.IsDead == true)
         {
-            EnergyCost.UpgradeBy(-1);
+            ApplyCostReduction();
+            // Sync to the deck version so the reduction persists after combat
+            (DeckVersion as GoldenBullet)?.ApplyCostReduction();
         }
+    }
+
+    public void ApplyCostReduction()
+    {
+        EnergyCost.UpgradeBy(-1);
     }
 
     protected override void OnUpgrade()

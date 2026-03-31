@@ -15,10 +15,10 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class Manifest : HermitCard
 {
-    private const int BlockAmount = 12;
-    private const int UpgradedBlockAmount = 16;
+    private const int BlockAmount = 16;
+    private const int UpgradedBlockAmount = 20;
 
-    public Manifest() : base(1, CardType.Skill, CardRarity.Common, TargetType.None) { }
+    public Manifest() : base(2, CardType.Skill, CardRarity.Common, TargetType.None) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)BlockAmount, ValueProp.Move)];
 

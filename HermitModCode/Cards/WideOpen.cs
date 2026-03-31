@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Powers;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -17,14 +18,14 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class WideOpen : HermitCard
 {
-    private const int DamageAmount = 5;
+    private const int DamageAmount = 6;
     private const int UpgradedDamageAmount = 8;
 
     public WideOpen() : base(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
         new DamageVar((decimal)DamageAmount, ValueProp.Move),
-        new PowerVar<VulnerablePower>(2m)
+        new PowerVar<VulnerablePower>(1m)
     ];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<VulnerablePower>()];
@@ -32,7 +33,8 @@ public sealed class WideOpen : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
-        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+        HermitSfx.PlayGun2();
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitGunHitFx().Execute(ctx);
         await PowerCmd.Apply<VulnerablePower>(play.Target, DynamicVars["VulnerablePower"].BaseValue, Owner.Creature, this);
     }
 

@@ -15,10 +15,10 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class Midnight : HermitCard
 {
-    private const int BlockAmount = 8;
-    private const int UpgradedBlockAmount = 11;
+    private const int BlockAmount = 12;
+    private const int UpgradedBlockAmount = 15;
 
-    public Midnight() : base(1, CardType.Skill, CardRarity.Common, TargetType.None) { }
+    public Midnight() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)BlockAmount, ValueProp.Move)];
 

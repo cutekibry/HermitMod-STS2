@@ -13,10 +13,10 @@ namespace HermitMod.Cards;
 
 public class HoleUp() : HermitCard(1, CardType.Skill, CardRarity.Common, TargetType.Self)
 {
-    private const int Blk = 10;
+    private const int Blk = 12;
     private const int UpgradeBlk = 4;
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)Blk, ValueProp.Move), new PowerVar<WeakPower>(1m)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)Blk, ValueProp.Move), new PowerVar<WeakPower>(2m)];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<WeakPower>()];
 
@@ -24,7 +24,7 @@ public class HoleUp() : HermitCard(1, CardType.Skill, CardRarity.Common, TargetT
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
-        await PowerCmd.Apply<WeakPower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<WeakPower>(Owner.Creature, 2, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

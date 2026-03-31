@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Patches;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -16,10 +17,10 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class Ricochet : HermitCard
 {
-    private const int DamageAmount = 3;
-    private const int UpgradedDamageAmount = 5;
+    private const int DamageAmount = 7;
+    private const int UpgradedDamageAmount = 9;
 
-    public Ricochet() : base(1, CardType.Attack, CardRarity.Common, TargetType.AllEnemies) { }
+    public Ricochet() : base(1, CardType.Attack, CardRarity.Uncommon, TargetType.AllEnemies) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
 
@@ -28,9 +29,11 @@ public sealed class Ricochet : HermitCard
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
 
         // Always hit once
+        HermitSfx.PlayGun2();
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .TargetingAllOpponents(CombatState)
+            .WithHermitGunHitFx()
             .Execute(ctx);
 
         // Repeat for each Dead On effect triggered this turn
@@ -44,9 +47,11 @@ public sealed class Ricochet : HermitCard
             var randomIndex = new System.Random().Next(enemies.Count);
             var target = enemies[randomIndex];
 
+            HermitSfx.PlayGun3();
             await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
                 .FromCard(this)
                 .Targeting(target)
+                .WithHermitGunHitFx()
                 .Execute(ctx);
         }
     }

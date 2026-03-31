@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Character;
+using HermitMod.Utility;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -16,10 +17,12 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class DeadOrAlive : HermitCard
 {
-    private const int DamageAmount = 10;
-    private const int UpgradedDamageAmount = 14;
+    private const int DamageAmount = 8;
+    private const int UpgradedDamageAmount = 11;
+    private const int BountyGold = 15;
+    private const int UpgradedBountyGold = 25;
 
-    public DeadOrAlive() : base(1, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
+    public DeadOrAlive() : base(1, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy) { }
 
     protected override bool HasEnergyCostX => true;
 
@@ -36,16 +39,18 @@ public sealed class DeadOrAlive : HermitCard
         for (int i = 0; i < times; i++)
         {
             await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
-            await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+            await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitBluntLightHitFx().Execute(ctx);
 
             // Stop if target died
             if (play.Target?.IsDead == true) break;
         }
 
-        // If Fatal (target died), gain Bounty
+        // If Fatal (target died), gain gold and track Bounty
         if (play.Target?.IsDead == true)
         {
-            await PowerCmd.Apply<BountyPower>(Owner.Creature, 1, Owner.Creature, this);
+            int gold = IsUpgraded ? UpgradedBountyGold : BountyGold;
+            await PlayerCmd.GainGold(gold, Owner);
+            await PowerCmd.Apply<BountyPower>(Owner.Creature, gold, Owner.Creature, this);
         }
     }
 

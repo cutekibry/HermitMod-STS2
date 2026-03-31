@@ -11,18 +11,21 @@ using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace HermitMod.Cards;
 
+/// <summary>
+/// Apply 2 Vulnerable to yourself. Gain 2 Rugged. Exhaust.
+/// Upgrade: 1 Vulnerable, 1 Rugged.
+/// </summary>
 public sealed class Gestalt : HermitCard
 {
-    private const int RuggedAmt = 2;
-    private const int UpgradedRuggedAmt = 3;
-    private const int VulnAmt = 1;
-    private const int UpgradedVulnAmt = 2;
+    private const int BaseVulnAmount = 2;
+    private const int UpgradedVulnAmount = 1;
+    private const int RuggedAmount = 2;
 
-    public Gestalt() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
+    public Gestalt() : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new PowerVar<RuggedPower>((decimal)RuggedAmt),
-        new PowerVar<VulnerablePower>((decimal)VulnAmt)
+        new PowerVar<RuggedPower>((decimal)RuggedAmount),
+        new PowerVar<VulnerablePower>((decimal)BaseVulnAmount)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
@@ -31,19 +34,16 @@ public sealed class Gestalt : HermitCard
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<VulnerablePower>()];
 
-    private int CurrentRugged => IsUpgraded ? UpgradedRuggedAmt : RuggedAmt;
-    private int CurrentVuln => IsUpgraded ? UpgradedVulnAmt : VulnAmt;
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<RuggedPower>(Owner.Creature, CurrentRugged, Owner.Creature, this);
-        await PowerCmd.Apply<VulnerablePower>(Owner.Creature, CurrentVuln, Owner.Creature, this);
+        int vulnAmount = IsUpgraded ? UpgradedVulnAmount : BaseVulnAmount;
+        await PowerCmd.Apply<VulnerablePower>(Owner.Creature, vulnAmount, Owner.Creature, this);
+        await PowerCmd.Apply<RuggedPower>(Owner.Creature, RuggedAmount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["RuggedPower"].UpgradeValueBy(UpgradedRuggedAmt - RuggedAmt);
-        DynamicVars["VulnerablePower"].UpgradeValueBy(UpgradedVulnAmt - VulnAmt);
+        DynamicVars["VulnerablePower"].UpgradeValueBy(UpgradedVulnAmount - BaseVulnAmount); // 2 → 1
     }
 }

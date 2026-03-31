@@ -15,7 +15,7 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class Glare : HermitCard
 {
-    public Glare() : base(1, CardType.Skill, CardRarity.Common, TargetType.AnyEnemy) { }
+    public Glare() : base(0, CardType.Skill, CardRarity.Common, TargetType.AnyEnemy) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<WeakPower>(1m)];
 
@@ -33,6 +33,6 @@ public sealed class Glare : HermitCard
 
     protected override void OnUpgrade()
     {
-        DynamicVars["WeakPower"].UpgradeValueBy(1m);
+        // Upgrade only adds Retain (handled by CanonicalKeywords), no stat change
     }
 }

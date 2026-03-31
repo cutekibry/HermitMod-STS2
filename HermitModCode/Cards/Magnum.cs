@@ -1,4 +1,5 @@
 using HermitMod.Cards;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -15,8 +16,8 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class Magnum : HermitCard
 {
-    private const int DamageAmount = 8;
-    private const int UpgradedDamageAmount = 12;
+    private const int DamageAmount = 6;
+    private const int UpgradedDamageAmount = 8;
     private const int DiscardCount = 6;
 
     public Magnum() : base(1, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy) { }
@@ -44,12 +45,13 @@ public sealed class Magnum : HermitCard
                 await CardCmd.Discard(ctx, selected);
 
                 await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
+                HermitSfx.PlayGun1();
 
                 // Deal damage once per card discarded
                 for (int i = 0; i < selected.Count; i++)
                 {
                     if (play.Target?.IsDead == true) break;
-                    await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+                    await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitGunHitFx().Execute(ctx);
                 }
             }
         }

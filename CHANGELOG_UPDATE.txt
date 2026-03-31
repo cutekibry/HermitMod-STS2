@@ -1,0 +1,386 @@
+The Hermit v1.1.0 — Major Card Accuracy & Bug Fix Update
+
+This is a large update that brings every card in line with The Hermit v1.56 — the final version from DownfallSTS (STS1). A full audit of all 75+ cards was performed by comparing our STS2 implementations against the original Java source code on the DownfallSTS GitHub repository. In addition to card accuracy, several gameplay-breaking bugs have been fixed.
+
+Many thanks to the community members who took the time to report issues. You are all credited at the bottom of this post.
+
+=============================================
+BUG FIXES
+=============================================
+
+1. SPRAY N' PRAY — NOT SHUFFLING DOUBT, WRONG TARGETING (reported by berserker2111)
+
+   Previously, Spray n' Pray dealt damage to ALL enemies and did not shuffle a Doubt into the draw pile. Both of these were wrong.
+
+   Fixed: The card now deals damage to random enemies (3 hits) and correctly shuffles a Doubt into the draw pile after dealing damage. Rarity was also corrected from Uncommon to Common.
+
+2. CHEAT — DOES NOTHING WHEN PLAYED (reported by Goodcat33)
+
+   The Cheat card let you pick a card from the top of your draw pile, but then nothing happened. The card you picked just vanished.
+
+   Root cause: The selected card was still in the draw pile when AutoPlay was called. STS2's AutoPlay only works on cards that are in the player's hand.
+
+   Fixed: The selected card is now moved to the player's hand first, then auto-played. Works in both single player and multiplayer.
+
+3. ETERNAL FORM — AFFECTS HOST INSTEAD OF HERMIT IN MULTIPLAYER (reported by Goodcat33)
+
+   In multiplayer, if the Hermit wasn't the host, Eternal Form's cost reduction was being applied to the host character's drawn cards instead of the Hermit player's cards.
+
+   Root cause: The AfterCardDrawn hook fires for ALL players' cards, not just the power owner's. There was no check to verify the drawn card belonged to the Hermit player.
+
+   Fixed: Added an owner check — `if (card.Owner != Owner.Player) return;` — so the cost reduction only applies to the Hermit's own cards.
+
+4. DENTED PLATE RELIC — NO HP CHECK, MISSING CARD DRAW (reported by Condomknight)
+
+   The Dented Plate relic was granting +1 Energy at the start of every turn regardless of HP. It's supposed to only activate when you're at or below 50% HP, and it should also draw a card.
+
+   Fixed: Added the HP <= 50% check (`creature.CurrentHp > creature.MaxHp / 2`). Also added the missing card draw. Also switched from AfterEnergyReset to BeforeSideTurnStart hook so it has proper context for drawing cards.
+
+5. EPOCH/TIMELINE STUCK BUG — PHANTOM EPOCHS AFTER FIRST WIN (reported by rekij)
+
+   After beating the first run with Hermit, 4 epochs appeared on the timeline to reveal. After going through them, one would not register as obtained, leaving you stuck in the timeline screen unable to start a new run.
+
+   Root cause: The epoch slot initializer was calling UnlockSlot() for ALL 6 Hermit epochs on every game load, which created phantom "NotObtained" entries for epochs the player hadn't actually earned yet. These showed up as locked epochs with no way to unlock them.
+
+   Fixed: The initializer now only promotes epochs that are in the "ObtainedNoSlot" state (meaning the player actually earned them but they didn't have a timeline slot yet). Epochs that haven't been obtained are left alone.
+
+6. CONCENTRATION POWER — STACK DECREMENT ERROR
+
+   When a Concentration stack was consumed (e.g., by playing a Dead On card with Concentration active), the game would hit a read-only property error because PowerModel.Amount can't be set directly from outside the class.
+
+   Fixed: Added a public ConsumeStack() method on ConcentrationPower that calls the protected SetAmount() internally, then removes the power if stacks hit 0.
+
+=============================================
+CARD STAT AUDIT — FULL BREAKDOWN
+=============================================
+
+Every card below was compared against the DownfallSTS GitHub source (v1.56). Values shown as Base(Upgraded). "Was" = previous STS2 implementation. "Now" = corrected to match v1.56.
+
+---------------------------------------------
+ATTACK CARDS
+---------------------------------------------
+
+SNAPSHOT
+  Was: Upgrade damage 9 | Now: Upgrade damage 8
+  Everything else unchanged.
+
+HEADSHOT
+  Was: Cost 2, damage 12(16)
+  Now: Cost 1, damage 7(9)
+
+CALLED SHOT
+  Was: Uncommon, cost 1, damage 7(10), no Retain
+  Now: Common, cost 0, damage 5(7), upgrade adds Retain keyword
+
+DEADEYE
+  Was: Common, damage 7(10), strength gain 1(2)
+  Now: Uncommon, damage 5(6), strength gain 2(3)
+
+ENERVATE
+  Was: Common, damage 8(12)
+  Now: Uncommon, damage 7(10)
+
+MISFIRE
+  Was: Damage 12(18)
+  Now: Damage 11(15)
+
+WIDE OPEN
+  Was: Damage 5(5), vuln 2(3)
+  Now: Damage 6(6), vuln 1(2)
+
+QUICKDRAW
+  Was: Damage 7(10), no card draw
+  Now: Damage 9(11), draw 2(3) cards, next turn draw 1 less
+
+SHORT FUSE
+  Was: Common, damage 14(18)
+  Now: Uncommon, damage 18(22)
+
+PISTOL WHIP
+  Was: Bruise 2(3)
+  Now: Bruise 3(5)
+
+ROUGHHOUSE
+  Was: Common, cost 1, damage 7(10), block 5(7)
+  Now: Rare, cost 3, damage 24(30), block 20(24)
+
+GOLDEN BULLET
+  Was: Rare, cost 2, damage 20(28)
+  Now: Uncommon, cost 3, damage 18(24)
+
+PURGATORY
+  Was: Damage 20(28), keyword: Exhaust
+  Now: Damage 24(30), keyword: Ethereal (no longer Exhausts)
+
+DEAD OR ALIVE
+  Was: Uncommon, damage 10(14)
+  Now: Rare, damage 8(11)
+
+ROULETTE
+  Was: Uncommon, cost 1, damage 8(11), simple attack
+  Now: Common, cost 2, damage 16(20), now also discards your hand then redraws that many cards
+
+SHOWDOWN
+  Was: Rare, cost 2, damage 12(16)
+  Now: Uncommon, cost 1, damage 9(12)
+  Still plays all Strikes in hand.
+
+MAGNUM
+  Was: Damage 8(12)
+  Now: Damage 6(8)
+  Still discards 6 cards and hits per card.
+
+ROUNDHOUSE KICK
+  Was: Damage 15(20)
+  Now: Damage 13(18)
+  Still hits all enemies and stuns non-attackers.
+
+DESPERADO — COMPLETE REWORK
+  Was: Common, cost 2, dealt 7(10) damage 3 times (multi-hit)
+  Now: Uncommon, cost 1, deals 10(12) damage in a single hit, then DOUBLES this card's damage for the rest of combat and increases its own cost by 1. This is a scaling card — it gets more powerful but more expensive each time you play it.
+
+HIGH-CALIBER
+  Was: Uncommon, cost 2, damage 15(20), Exhaust, adds 1 Strike
+  Now: Common, cost 1, damage 6(9), Exhaust, adds 1 Strike
+  (In STS1, the generated Strike had +2/+3 bonus damage. STS2 generates a normal Strike since custom Strike variants aren't easily supported.)
+
+RICOCHET
+  Was: Common, damage 3(5)
+  Now: Uncommon, damage 7(9)
+  Still hits all enemies + repeats per Dead On trigger this turn.
+
+ITCHY TRIGGER
+  Was: Uncommon, damage 8(11)
+  Now: Common, damage 7(9)
+  Dead On effect unchanged (reduce random card cost by 1).
+
+FINAL CANTER
+  Was: Cost 1, damage 8(12)
+  Now: Cost 0, damage 10(13)
+  Still has Retain + Exhaust.
+
+---------------------------------------------
+SKILL CARDS
+---------------------------------------------
+
+BODY ARMOR
+  Was: Block 7(10)
+  Now: Block 5(7)
+  Mechanic unchanged (discard a card, gain block, double if non-Attack).
+
+FEINT
+  Was: Cost 1, block 6(9)
+  Now: Cost 0, block 3(5)
+  Still applies Bruise to all enemies.
+
+FLASH POWDER
+  Was: Block 6(9), strength loss 2(3)
+  Now: Block 5 (no block upgrade), strength loss 1(2)
+  Upgrade now only increases the strength loss, not the block.
+
+HOLE UP
+  Was: Block 10(14), weak 1(1)
+  Now: Block 12(16), weak 2(2)
+
+HORROR
+  Was: Common
+  Now: Uncommon, upgrade bruise increased to 5
+
+COALESCENCE
+  Was: Uncommon, block 7(10)
+  Now: Common, block 6(9)
+
+MIDNIGHT
+  Was: Common, block 8(11)
+  Now: Uncommon, block 12(15)
+
+MANIFEST
+  Was: Cost 1, block 12(16)
+  Now: Cost 2, block 16(20)
+
+DISSOLVE
+  Was: Uncommon, cost 1, block 10(14)
+  Now: Rare, cost 2, block 18(25)
+
+GLARE
+  Was: Cost 1, applies 1(2) Weak and 1(2) Vulnerable, upgrade adds Retain
+  Now: Cost 0, always applies 1 Weak and 1 Vulnerable, upgrade ONLY adds Retain (no stat increase)
+
+SPITE
+  Was: Cost 1, block 7(10), draw 1(2)
+  Now: Cost 2, block 8 (no block upgrade), draw 3(4)
+  Still Exhausts all Unplayable cards in hand.
+
+DIVE
+  Was: Cost 2, block 10(14), Dead On: draw 1 card
+  Now: Cost 1, block 8(10), Dead On: gain 4(6) additional Block
+  (In STS1, Dead On granted Plated Armor. Plated Armor does not exist in STS2, so this has been adapted to bonus Block. See Known Limitations.)
+
+LOW PROFILE
+  Was: Block 6(9), draw 1 card
+  Now: Block 7(9), gain +4(+5) additional Block for each debuff currently on you
+  This is a completely different card now — it rewards you for being debuffed rather than being a generic block+draw.
+
+SCAVENGE — COMPLETE REWORK
+  Was: Uncommon, block 5(8), draw 1(2), Exhaust
+  Now: Uncommon, block 12(15), Dead On: gain 5(10) Gold, Exhaust
+  (In STS1, this granted Plated Armor 4(5) instead of Block. Adapted to Block since Plated Armor doesn't exist in STS2. See Known Limitations.)
+
+REPRIEVE — COMPLETE REWORK
+  Was: Uncommon, cost 1, block 8(12), heal 3(5), Exhaust
+  Now: Rare, cost 2, heal 10(13), Ethereal, Exhaust — NO block
+  This is now a pure healing card with high value but heavy restrictions (Ethereal + Exhaust + high cost).
+
+VIRTUE
+  Was: Rare, cost 1
+  Now: Uncommon, cost 0, Retain
+  Base effect: reduce each debuff on you by 1. Upgrade: reduce by 2.
+
+DEAD MAN'S HAND — REWORKED
+  Was: Rare, cost 1, add the 3(4) rarest cards from draw pile to hand
+  Now: Uncommon, cost 1(0), discard your entire hand then draw 3 cards
+  Upgrade now reduces cost from 1 to 0 (instead of drawing more cards).
+
+SNIPE
+  Was: Common, cost 1, applies 1(2) Snipe stacks, Exhaust
+  Now: Uncommon, cost 0, applies 1 Snipe stack, Exhaust. Upgrade adds Concentrate instead of more Snipe stacks.
+
+EYE OF THE STORM
+  Was: Rare, cost 0, Concentrate + gain 3(4) Energy, Exhaust
+  Now: Uncommon, cost 1(0), Concentrate + gain 3 Energy, Exhaust
+  Upgrade now reduces cost from 1 to 0 (instead of gaining more energy).
+
+GESTALT
+  Was: Cost 1, Rugged 2(3), Vulnerable 1(2), Exhaust
+  Now: Cost 2, Vulnerable 2(1), Rugged 2(1), Exhaust
+  Key change: upgrade now DECREASES both Vulnerable and Rugged from 2 to 1 (less self-vuln, but also less Rugged). This is a trade-off card where upgrading makes the downside smaller but also the upside smaller.
+
+HEROIC BRAVADO — COMPLETE REWORK
+  Was: Uncommon, cost 1, gain 2(3) Rugged, increase this card's cost by 1
+  Now: Rare, cost 1, Ethereal, gain 1 Rugged, REDUCE this card's cost by 2(1) this combat
+  Completely inverted economy — card gets CHEAPER each play instead of more expensive. Ethereal means you must play it or lose it. Upgrade reduces the cost decrease from 2 to 1 (slower cost reduction, but same Rugged).
+
+FULLY LOADED
+  Was: Cost 2, Exhaust, upgrade reduces cost to 1
+  Now: Cost 0, Exhaust, upgrade adds Retain
+  Pulls all Strikes and Defends from draw pile to hand.
+
+FROM BEYOND — REWORKED
+  Was: Attack, cost 2, deal 10(15) damage per exhausted card to random enemies, Exhaust
+  Now: Skill, cost 1, each exhausted card causes a random enemy to lose 5(7) HP, NO Exhaust
+  Key changes: type changed from Attack to Skill, damage changed to HP loss (bypasses Block, matches STS1's FastLoseHPAction), removed Exhaust so it can be replayed, lower numbers but repeatable.
+
+---------------------------------------------
+POWER CARDS
+---------------------------------------------
+
+Nearly every power card had the same incorrect upgrade behavior: "upgrade reduces cost by 1." In STS1 v1.56, most Hermit powers keep their cost and instead improve their effect or add a keyword on upgrade.
+
+ADAPT
+  Was: Uncommon, cost 1(0)
+  Now: Rare, cost 3(2)
+  Effect unchanged (exhaust a card at start of turn to gain 8 Block).
+
+OVERWHELMING POWER
+  Was: Draw 2, HP loss 3, upgrade reduced cost
+  Now: Draw 3(4), HP loss 4(3), upgrade improves draw and reduces HP loss (cost stays at 1)
+
+LUCK OF THE DRAW
+  Was: Rare
+  Now: Uncommon
+  Effect unchanged.
+
+BRAWL
+  Was: Rare, cost 2, apply Bruise, upgrade reduced cost to 1
+  Now: Uncommon, cost 2, apply 3(5) Bruise, upgrade increases Bruise amount
+  The Bruise amount is now visible and scales with upgrade.
+
+COMBO
+  Was: Uncommon, cost 1, apply 1 Combo, upgrade reduced cost to 0
+  Now: Uncommon, cost 1, apply 1(2) Combo, upgrade increases Combo stacks
+
+SMOKING BARREL (Big Shot)
+  Was: Uncommon, cost 1, apply 1, upgrade reduced cost to 0
+  Now: Uncommon, cost 1, apply 3(4) bonus damage per Dead On, upgrade increases bonus damage
+
+DETERMINATION
+  Was: Rare, cost 1, upgrade reduced cost to 0
+  Now: Uncommon, cost 1, upgrade adds Innate keyword (starts in opening hand)
+  Effect unchanged (gain 1 Strength whenever a debuff is applied to you).
+
+SHADOW CLOAK
+  Was: Rare, cost 1, apply 1, upgrade reduced cost to 0
+  Now: Uncommon, cost 1, gain 4(6) Block per Curse drawn/exhausted, upgrade increases Block amount
+
+ETERNAL FORM
+  Was: Rare, cost 3, upgrade reduced cost to 2
+  Now: Rare, cost 3, Ethereal, upgrade REMOVES Ethereal (cost stays at 3)
+  This is a significant change — unupgraded Eternal Form is now Ethereal, meaning it discards at end of turn if not played. Upgrading removes this restriction.
+
+FATAL DESIRE
+  Was: Rare, cost 1, upgrade reduced cost to 0
+  Now: Rare, cost 1, upgrade adds Innate keyword (starts in opening hand)
+  Effect unchanged (draw 2 cards + add Injury at start of turn).
+
+HIGH NOON
+  Was: Cost 2, upgrade to 1
+  Now: Cost 1, upgrade to 0
+
+BLACK WIND
+  Was: Rare, cost 2, Ethereal + Exhaust, upgrade removed Ethereal
+  Now: Rare, cost 2(1), Ethereal + Exhaust always, upgrade reduces cost from 2 to 1
+  Ethereal is no longer removable — the card always discards if not played. But upgrading makes it cheaper to play.
+
+=============================================
+KNOWN LIMITATIONS & STS2 ADAPTATIONS
+=============================================
+
+Some STS1 mechanics don't have direct equivalents in STS2. These cards have been adapted as faithfully as possible:
+
+1. PLATED ARMOR DOES NOT EXIST IN STS2
+   Plated Armor was an STS1 buff that granted Block at the end of every turn and lost 1 stack when you took unblocked damage. STS2 does not have this mechanic.
+
+   Affected cards:
+   - Dive: Dead On originally granted 1(2) Plated Armor. Now grants 4(6) bonus Block instead (one-time, not recurring). The Block values are higher to compensate for losing the recurring nature.
+   - Scavenge: Originally granted 4(5) Plated Armor. Now grants 12(15) Block instead. Values scaled up significantly since Block is one-time vs. Plated Armor's recurring benefit.
+
+   If there's community interest, we may implement a custom Plated Armor power in a future update.
+
+2. ENHANCED STRIKE GENERATION (High-Caliber)
+   In STS1, High-Caliber generated a Strike with +2(+3) bonus damage. STS2 doesn't easily support creating modified copies of existing cards with stat bonuses, so a normal Strike is generated instead. The base damage of High-Caliber itself (6/9) partially compensates.
+
+3. GOLD GAIN (Scavenge Dead On)
+   Scavenge's Dead On effect grants gold using PlayerCmd.GainGold. This API call is unverified — if the gold gain doesn't work in-game, please report it and we'll find an alternative.
+
+4. DESPERADO SELF-SCALING
+   Desperado's "double damage and increase cost" mechanic uses STS2's DynamicVar and EnergyCost APIs. The scaling should persist for the rest of combat, but if the numbers behave unexpectedly (e.g., not persisting between turns, or stacking incorrectly), please let us know.
+
+5. FROM BEYOND — HP LOSS VS. DAMAGE
+   From Beyond uses unblockable/unpowered damage to simulate STS1's HP loss (FastLoseHPAction). This means it bypasses Block, which is faithful to the original. However, it may interact differently with damage-modifying effects than in STS1.
+
+6. HEROIC BRAVADO — COST REDUCTION
+   Heroic Bravado reduces its own cost each time it's played. The STS2 API for permanent cost modification (SetCustomBaseCost) may behave slightly differently from STS1's ReduceCostActionFixed. If the cost reduction doesn't persist correctly between turns, please report it.
+
+=============================================
+SPRITE/VISUAL FIXES
+=============================================
+
+- Adjusted the Hermit's left arm/gun sprite position to properly connect at the sleeve opening instead of floating above the shoulder. All idle and cast animation keyframes updated to match.
+
+=============================================
+CREDITS & THANKS
+=============================================
+
+This update would not have been possible without the community. Thank you to everyone who tested the mod and took the time to report issues:
+
+- Metacusa — Identified that the mod was based on an outdated version of The Hermit, not the final v1.56. Provided detailed side-by-side comparisons of card stats (with upgrade values) that made it clear a full audit was needed. This single report led to the correction of 40+ cards across every rarity and type. Massive thanks.
+
+- berserker2111 — Reported that Spray n' Pray was not shuffling a Doubt into the draw pile and was incorrectly damaging all enemies instead of random targets. Both issues confirmed and fixed.
+
+- rekij — Reported the epoch/timeline stuck bug where completing your first Hermit run created phantom locked epochs that couldn't be obtained, trapping you on the timeline screen. This was a nasty state machine bug in how epoch slots were initialized.
+
+- Condomknight — Reported that the Dented Plate relic was giving energy even above 50% HP and wasn't drawing a card. Both the HP threshold check and the card draw were missing from the implementation.
+
+- Goodcat33 — Reported two separate issues: Eternal Form reducing costs for the wrong player in multiplayer, and Cheat doing absolutely nothing when played. Both were confirmed and fixed. The multiplayer bug in particular helped us identify a pattern that could affect other cards with similar hooks.
+
+If you find any remaining discrepancies with STS1 v1.56, new bugs, or if any of the adapted mechanics (Plated Armor -> Block, gold gain, self-scaling) don't work as expected in-game, please don't hesitate to report them. Every bug report helps make this port better.

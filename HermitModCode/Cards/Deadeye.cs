@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Patches;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -19,12 +20,12 @@ public sealed class Deadeye : HermitCard
 {
     public override bool HasDeadOn => true;
 
-    private const int DamageAmount = 7;
-    private const int UpgradedDamageAmount = 10;
-    private const int StrengthAmt = 1;
-    private const int UpgradedStrengthAmt = 2;
+    private const int DamageAmount = 5;
+    private const int UpgradedDamageAmount = 6;
+    private const int StrengthAmt = 2;
+    private const int UpgradedStrengthAmt = 3;
 
-    public Deadeye() : base(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy) { }
+    public Deadeye() : base(1, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move), new PowerVar<StrengthPower>((decimal)StrengthAmt)];
 
@@ -38,6 +39,7 @@ public sealed class Deadeye : HermitCard
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .Targeting(play.Target)
+            .WithHermitBluntHeavyHitFx()
             .Execute(ctx);
 
         if (DeadOnHelper.IsDeadOn)

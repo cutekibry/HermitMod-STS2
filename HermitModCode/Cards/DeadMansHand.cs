@@ -8,28 +8,35 @@ using MegaCrit.Sts2.Core.Models;
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Discard your hand. Add the 3 rarest cards from draw pile to hand.
-/// Upgrade: 4 rarest cards.
+/// Discard your hand. Draw 3 cards.
+/// Upgrade: Cost reduced from 1 to 0.
 /// </summary>
 public sealed class DeadMansHand : HermitCard
 {
-    private const int CardCount = 3;
-    private const int UpgradedCardCount = 4;
+    private const int DrawCount = 3;
 
-    public DeadMansHand() : base(1, CardType.Skill, CardRarity.Rare, TargetType.Self) { }
+    public DeadMansHand() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.Self) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar(CardCount)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar(DrawCount)];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
-        // Simplified: Draw cards from draw pile
-        await CardPileCmd.Draw(ctx, CardCount, Owner, false);
+        // Discard entire hand
+        var handCards = PileType.Hand.GetPile(Owner).Cards.ToList();
+        if (handCards.Count > 0)
+        {
+            await CardCmd.Discard(ctx, handCards);
+        }
+
+        // Draw 3 cards
+        await CardPileCmd.Draw(ctx, DrawCount, Owner, false);
     }
 
     protected override void OnUpgrade()
     {
-        // 3 -> 4 rarest cards (handled in OnPlay)
+        EnergyCost.UpgradeBy(-1); // 1 → 0
+        EnergyCost.FinalizeUpgrade();
     }
 }

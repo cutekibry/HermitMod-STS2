@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
@@ -19,14 +20,16 @@ public sealed class GhostlyPresence : HermitCard
 {
     public override bool HasDeadOn => true;
 
-    private const int BlockAmount = 7;
-    private const int UpgradedBlockAmount = 10;
+    private const int BlockAmount = 8;
+    private const int UpgradedBlockAmount = 11;
     private const int WeakAmount = 1;
     private const int UpgradedWeakAmount = 2;
 
     public GhostlyPresence() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)BlockAmount, ValueProp.Move), new PowerVar<WeakPower>((decimal)WeakAmount)];
+
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<WeakPower>()];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {

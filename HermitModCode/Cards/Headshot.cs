@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Patches;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -9,18 +10,19 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace HermitMod.Cards;
 
-public class Headshot() : HermitCard(2, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
+public class Headshot() : HermitCard(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
 {
     public override bool HasDeadOn => true;
 
-    private const int Dmg = 12;
-    private const int UpgradeDmg = 4;
+    private const int Dmg = 7;
+    private const int UpgradeDmg = 2;
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)Dmg, ValueProp.Move)];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
+        HermitSfx.PlayGun2();
 
         int damage = DynamicVars.Damage.IntValue;
         if (DeadOnHelper.IsDeadOn)
@@ -28,7 +30,7 @@ public class Headshot() : HermitCard(2, CardType.Attack, CardRarity.Common, Targ
             damage *= 2;
         }
 
-        await DamageCmd.Attack(damage).FromCard(this).Targeting(play.Target).Execute(ctx);
+        await DamageCmd.Attack(damage).FromCard(this).Targeting(play.Target).WithHermitGunHitFx().Execute(ctx);
     }
 
     protected override void OnUpgrade()

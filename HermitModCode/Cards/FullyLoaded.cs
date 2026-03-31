@@ -1,4 +1,5 @@
 using HermitMod.Cards;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -12,12 +13,15 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class FullyLoaded : HermitCard
 {
-    public FullyLoaded() : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
+    public FullyLoaded() : base(0, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        IsUpgraded ? [CardKeyword.Exhaust, CardKeyword.Retain] : [CardKeyword.Exhaust];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
+        HermitSfx.PlaySpin();
+        HermitSfx.PlayReload();
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
         var drawPile = PileType.Draw.GetPile(Owner);
@@ -36,7 +40,6 @@ public sealed class FullyLoaded : HermitCard
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
-        EnergyCost.FinalizeUpgrade();
+        // Upgrade adds Retain (handled by CanonicalKeywords), no cost change
     }
 }

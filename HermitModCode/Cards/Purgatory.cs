@@ -1,4 +1,5 @@
 using HermitMod.Cards;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -14,14 +15,14 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class Purgatory : HermitCard
 {
-    private const int DamageAmount = 20;
-    private const int UpgradedDamageAmount = 28;
+    private const int DamageAmount = 24;
+    private const int UpgradedDamageAmount = 30;
 
     public Purgatory() : base(3, CardType.Attack, CardRarity.Rare, TargetType.AllEnemies) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Ethereal];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
@@ -29,6 +30,7 @@ public sealed class Purgatory : HermitCard
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
             .TargetingAllOpponents(CombatState)
+            .WithHermitFireHitFx()
             .Execute(ctx);
     }
 

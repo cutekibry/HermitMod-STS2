@@ -1,5 +1,6 @@
 using HermitMod.Cards;
 using HermitMod.Character;
+using HermitMod.Utility;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -35,7 +36,11 @@ public sealed class TrackingShot : HermitCard
 
         for (int i = 0; i < HitCount; i++)
         {
-            await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).Execute(ctx);
+            if (i == 0)
+                HermitSfx.PlayGun3();
+            else
+                HermitSfx.PlayGun1();
+            await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitGunHitFx().Execute(ctx);
         }
     }
 
