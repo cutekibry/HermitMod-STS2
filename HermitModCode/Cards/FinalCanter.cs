@@ -2,6 +2,7 @@ using HermitMod.Cards;
 using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
@@ -17,12 +18,16 @@ public sealed class FinalCanter : HermitCard
 {
     private const int DamageAmount = 10;
     private const int UpgradedDamageAmount = 13;
-    private const int BonusPerCurse = 3;
-    private const int UpgradedBonusPerCurse = 4;
+    private const int ExtraDamage = 3;
+    private const int UpgradedExtraDamage = 4;
 
     public FinalCanter() : base(0, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [
+        new CalculationBaseVar(DamageAmount),
+        new ExtraDamageVar(ExtraDamage),
+        new CalculatedDamageVar(ValueProp.Move).WithMultiplier(CountCurses)
+    ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Retain, CardKeyword.Exhaust];
 
@@ -30,27 +35,29 @@ public sealed class FinalCanter : HermitCard
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
 
-        // Count all Curse cards across all piles
-        int curseCount = 0;
-        foreach (var pileType in new[] { PileType.Draw, PileType.Hand, PileType.Discard, PileType.Exhaust })
-        {
-            var pile = pileType.GetPile(Owner);
-            if (pile != null)
-                curseCount += pile.Cards.Count(c => c.Type == CardType.Curse);
-        }
-
-        int bonusPerCurse = IsUpgraded ? UpgradedBonusPerCurse : BonusPerCurse;
-        decimal totalDamage = DynamicVars.Damage.BaseValue + (curseCount * bonusPerCurse);
-
-        await DamageCmd.Attack(totalDamage)
+        await DamageCmd.Attack(DynamicVars.CalculatedDamage)
             .FromCard(this)
-            .Targeting(play.Target)
+            .Targeting(play.Target!)
             .WithHermitFireHitFx()
             .Execute(ctx);
     }
 
+    private static decimal CountCurses(CardModel card, Creature? _)
+    {
+        int curseCount = 0;
+        foreach (var pileType in new[] { PileType.Draw, PileType.Hand, PileType.Discard, PileType.Exhaust })
+        {
+            var pile = pileType.GetPile(card.Owner);
+            if (pile != null)
+                curseCount += pile.Cards.Count(c => c.Type == CardType.Curse);
+        }
+
+        return curseCount;
+    }
+
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(UpgradedDamageAmount - DamageAmount);
+        DynamicVars.CalculationBase.UpgradeValueBy(UpgradedDamageAmount - DamageAmount);
+        DynamicVars.ExtraDamage.UpgradeValueBy(UpgradedExtraDamage - ExtraDamage);
     }
 }
