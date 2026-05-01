@@ -1,4 +1,4 @@
-using HermitMod.Cards;
+﻿using HermitMod.Cards;
 using HermitMod.Character;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
@@ -38,12 +38,12 @@ public sealed class Gestalt : HermitCard
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         int vulnAmount = IsUpgraded ? UpgradedVulnAmount : BaseVulnAmount;
-        await PowerCmd.Apply<VulnerablePower>(Owner.Creature, vulnAmount, Owner.Creature, this);
-        await PowerCmd.Apply<RuggedPower>(Owner.Creature, RuggedAmount, Owner.Creature, this);
+        await PowerCmd.Apply<VulnerablePower>(ctx, Owner.Creature, vulnAmount, Owner.Creature, this);
+        await PowerCmd.Apply<RuggedPower>(ctx, Owner.Creature, RuggedAmount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["VulnerablePower"].UpgradeValueBy(UpgradedVulnAmount - BaseVulnAmount); // 2 → 1
+        DynamicVars["VulnerablePower"].UpgradeValueBy(UpgradedVulnAmount - BaseVulnAmount); // 2 鈫?1
     }
 }

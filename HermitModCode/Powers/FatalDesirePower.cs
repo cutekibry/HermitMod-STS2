@@ -23,7 +23,7 @@ public sealed class FatalDesirePower : HermitPower
         await CardPileCmd.AddGeneratedCardToCombat(
             injury,
             PileType.Hand,
-            addedByPlayer: true
+            Owner.Player
         );
     }
 }

@@ -19,7 +19,7 @@ public sealed class OldLocket : HermitRelic
 
     private bool _firstTurn = true;
 
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, CombatState combatState)
+    public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
     {
         if (!_firstTurn || side != Owner.Creature.Side) return;
         _firstTurn = false;
@@ -29,7 +29,7 @@ public sealed class OldLocket : HermitRelic
         await CardPileCmd.AddGeneratedCardToCombat(
             card,
             PileType.Hand,
-            addedByPlayer: true
+            Owner
         );
     }
 

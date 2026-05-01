@@ -1,4 +1,4 @@
-using HermitMod.Cards;
+﻿using HermitMod.Cards;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.ValueProps;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -34,7 +34,7 @@ public sealed class Dissolve : HermitCard
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
 
         // Block not removed for 2 turns (apply Barricade-like duration effect)
-        await PowerCmd.Apply<BarricadePower>(Owner.Creature, BarricadeTurns, Owner.Creature, this);
+        await PowerCmd.Apply<BarricadePower>(ctx, Owner.Creature, BarricadeTurns, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

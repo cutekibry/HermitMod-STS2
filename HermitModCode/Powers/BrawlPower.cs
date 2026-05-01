@@ -22,7 +22,7 @@ public sealed class BrawlPower : HermitPower
 
         foreach (Creature enemy in CombatState.HittableEnemies)
         {
-            await PowerCmd.Apply<BruisePower>(enemy, Amount, Owner, null);
+            await PowerCmd.Apply<BruisePower>(choiceContext, enemy, Amount, Owner, null);
         }
     }
 }

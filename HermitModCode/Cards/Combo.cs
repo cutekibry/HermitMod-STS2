@@ -1,4 +1,4 @@
-using HermitMod.Cards;
+﻿using HermitMod.Cards;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -21,7 +21,7 @@ public sealed class Combo : HermitCard
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         int amount = DynamicVars["ComboPower"].IntValue;
-        await PowerCmd.Apply<ComboPower>(Owner.Creature, amount, Owner.Creature, this);
+        await PowerCmd.Apply<ComboPower>(ctx, Owner.Creature, amount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

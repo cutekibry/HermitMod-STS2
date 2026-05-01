@@ -36,7 +36,7 @@ public sealed class Misfire : HermitCard
 
         // Shuffle a Clumsy into the draw pile
         var clumsy = CombatState.CreateCard<Clumsy>(Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(clumsy, PileType.Draw, addedByPlayer: true);
+        await CardPileCmd.AddGeneratedCardToCombat(clumsy, PileType.Draw, Owner);
     }
 
     protected override void OnUpgrade()

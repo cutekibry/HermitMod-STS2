@@ -32,7 +32,7 @@ public sealed class TakeCover : HermitCard
         {
             var defend = CombatState.CreateCard<Defend_Hermit>(Owner);
             defend.EnergyCost.SetUntilPlayed(0, false);
-            await CardPileCmd.AddGeneratedCardToCombat(defend, PileType.Hand, addedByPlayer: true);
+            await CardPileCmd.AddGeneratedCardToCombat(defend, PileType.Hand, Owner);
         }
     }
 

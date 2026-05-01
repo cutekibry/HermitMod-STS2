@@ -38,7 +38,7 @@ public sealed class NoHoldsBarred : HermitCard
 
         foreach (var enemy in CombatState.HittableEnemies)
         {
-            await PowerCmd.Apply<BruisePower>(enemy, BruiseAmount, Owner.Creature, this);
+            await PowerCmd.Apply<BruisePower>(ctx, enemy, BruiseAmount, Owner.Creature, this);
         }
     }
 

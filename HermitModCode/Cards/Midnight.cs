@@ -31,7 +31,7 @@ public sealed class Midnight : HermitCard
 
         // Add an Impending Doom to hand
         var doom = CombatState.CreateCard<ImpendingDoom>(Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(doom, PileType.Hand, addedByPlayer: true);
+        await CardPileCmd.AddGeneratedCardToCombat(doom, PileType.Hand, Owner);
     }
 
     protected override void OnUpgrade()

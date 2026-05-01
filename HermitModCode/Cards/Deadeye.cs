@@ -44,7 +44,7 @@ public sealed class Deadeye : HermitCard
         {
             DeadOnHelper.IncrementDeadOnCount();
             int str = DynamicVars["StrengthPower"].IntValue;
-            await PowerCmd.Apply<StrengthPower>(Owner.Creature, str, Owner.Creature, this);
+            await PowerCmd.Apply<StrengthPower>(ctx, Owner.Creature, str, Owner.Creature, this);
         }
     }
 

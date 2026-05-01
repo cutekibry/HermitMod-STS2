@@ -1,4 +1,4 @@
-using HermitMod.Cards;
+﻿using HermitMod.Cards;
 using HermitMod.Character;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
@@ -30,7 +30,7 @@ public class Feint() : HermitCard(0, CardType.Skill, CardRarity.Common, TargetTy
         int bruise = DynamicVars["BruisePower"].IntValue;
         foreach (var enemy in CombatState.HittableEnemies)
         {
-            await PowerCmd.Apply<BruisePower>(enemy, bruise, Owner.Creature, this);
+            await PowerCmd.Apply<BruisePower>(ctx, enemy, bruise, Owner.Creature, this);
         }
     }
 

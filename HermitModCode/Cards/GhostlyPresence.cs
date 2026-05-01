@@ -1,4 +1,4 @@
-using HermitMod.Cards;
+﻿using HermitMod.Cards;
 using HermitMod.Patches;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.ValueProps;
@@ -42,7 +42,7 @@ public sealed class GhostlyPresence : HermitCard
             int weak = DynamicVars["WeakPower"].IntValue;
             foreach (Creature enemy in CombatState.HittableEnemies)
             {
-                await PowerCmd.Apply<WeakPower>(enemy, weak, Owner.Creature, this);
+                await PowerCmd.Apply<WeakPower>(ctx, enemy, weak, Owner.Creature, this);
             }
         }
     }

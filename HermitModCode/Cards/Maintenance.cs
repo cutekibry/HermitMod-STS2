@@ -35,8 +35,8 @@ public sealed class Maintenance : HermitCard
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         int strikeDmg = IsUpgraded ? UpgradedStrikeDmg : StrikeDmg;
         int dex = IsUpgraded ? UpgradedDexAmount : DexAmount;
-        await PowerCmd.Apply<MaintenanceStrikePower>(Owner.Creature, strikeDmg, Owner.Creature, this);
-        await PowerCmd.Apply<DexterityPower>(Owner.Creature, dex, Owner.Creature, this);
+        await PowerCmd.Apply<MaintenanceStrikePower>(ctx, Owner.Creature, strikeDmg, Owner.Creature, this);
+        await PowerCmd.Apply<DexterityPower>(ctx, Owner.Creature, dex, Owner.Creature, this);
 
         // This card costs 1 more each time it's played this combat
         EnergyCost.UpgradeBy(1);

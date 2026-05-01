@@ -20,7 +20,7 @@ public sealed class ShadowCloak : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<ShadowCloakPower>(Owner.Creature, DynamicVars["ShadowCloakPower"].IntValue, Owner.Creature, this);
+        await PowerCmd.Apply<ShadowCloakPower>(ctx, Owner.Creature, DynamicVars["ShadowCloakPower"].IntValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

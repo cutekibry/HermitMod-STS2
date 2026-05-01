@@ -50,7 +50,7 @@ public sealed class DeadOrAlive : HermitCard
         {
             int gold = IsUpgraded ? UpgradedBountyGold : BountyGold;
             await PlayerCmd.GainGold(gold, Owner);
-            await PowerCmd.Apply<BountyPower>(Owner.Creature, gold, Owner.Creature, this);
+            await PowerCmd.Apply<BountyPower>(ctx, Owner.Creature, gold, Owner.Creature, this);
         }
     }
 

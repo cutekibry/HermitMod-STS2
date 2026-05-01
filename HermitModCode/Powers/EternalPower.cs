@@ -17,7 +17,7 @@ public sealed class EternalPower : HermitPower
 
     private int _cardsReducedThisTurn;
 
-    public override Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, CombatState combatState)
+    public override Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
     {
         _cardsReducedThisTurn = 0;
         return Task.CompletedTask;

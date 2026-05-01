@@ -41,7 +41,7 @@ public sealed class Virtue : HermitCard
                 }
                 else
                 {
-                    await PowerCmd.Apply(power, Owner.Creature, -reduceBy, Owner.Creature, this);
+                    power.SetAmount(power.Amount - reduceBy);
                 }
             }
         }

@@ -30,7 +30,7 @@ public sealed class TrackingShot : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         // Concentrate: apply Concentration power
-        await PowerCmd.Apply<ConcentrationPower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<ConcentrationPower>(ctx, Owner.Creature, 1, Owner.Creature, this);
 
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
 

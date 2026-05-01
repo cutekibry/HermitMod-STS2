@@ -35,7 +35,7 @@ public sealed class HighCaliber : HermitCard
 
         // Add a Strike to hand
         var strike = CombatState.CreateCard<Strike_Hermit>(Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(strike, PileType.Hand, addedByPlayer: true);
+        await CardPileCmd.AddGeneratedCardToCombat(strike, PileType.Hand, Owner);
     }
 
     protected override void OnUpgrade()
