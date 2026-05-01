@@ -23,10 +23,9 @@ public sealed class Coalescence : HermitCard
     public Coalescence() : base(1, CardType.Skill, CardRarity.Common, TargetType.None) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new BlockVar((decimal)BlockAmount, ValueProp.Move)
+        new BlockVar((decimal)BlockAmount, ValueProp.Move),
+        new CardsVar(RetainCount)
     ];
-
-    private int CurrentRetainCount => IsUpgraded ? UpgradedRetainCount : RetainCount;
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
@@ -40,7 +39,7 @@ public sealed class Coalescence : HermitCard
         var retainable = hand.Cards.Where(c => !c.ShouldRetainThisTurn).ToList();
         if (retainable.Count == 0) return;
 
-        var prefs = new CardSelectorPrefs(SelectionScreenPrompt, 0, CurrentRetainCount);
+        var prefs = new CardSelectorPrefs(SelectionScreenPrompt, 0, DynamicVars.Cards.IntValue);
         var selected = (await CardSelectCmd.FromHand(
             prefs: prefs,
             context: ctx,
@@ -58,5 +57,6 @@ public sealed class Coalescence : HermitCard
     protected override void OnUpgrade()
     {
         DynamicVars.Block.UpgradeValueBy(UpgradedBlockAmount - BlockAmount);
+        DynamicVars.Cards.UpgradeValueBy(UpgradedRetainCount - RetainCount);
     }
 }
