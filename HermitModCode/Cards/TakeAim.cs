@@ -18,8 +18,6 @@ public sealed class TakeAim : HermitCard
 
     protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Concentrate];
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<TakeAimPower>()];
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);

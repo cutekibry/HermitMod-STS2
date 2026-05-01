@@ -15,8 +15,6 @@ public sealed class ShadowCloak : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<ShadowCloakPower>(4m)];
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<ShadowCloakPower>()];
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);

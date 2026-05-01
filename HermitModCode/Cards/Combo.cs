@@ -13,8 +13,6 @@ public sealed class Combo : HermitCard
 {
     public Combo() : base(1, CardType.Power, CardRarity.Uncommon, TargetType.None) { }
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<ComboPower>()];
-
     protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar("ComboPower", 1)];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)

@@ -25,8 +25,6 @@ public sealed class Horror : HermitCard
 
     protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Bruise];
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<HorrorPower>()];
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);

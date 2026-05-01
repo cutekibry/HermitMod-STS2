@@ -15,8 +15,6 @@ public sealed class BigShot : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<BigShotPower>(3m)];
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<BigShotPower>()];
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);

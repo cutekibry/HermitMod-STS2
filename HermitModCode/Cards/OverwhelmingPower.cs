@@ -28,8 +28,6 @@ public sealed class OverwhelmingPower : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new EnergyVar(EnergyGain), new CardsVar(DrawCount), new HpLossVar(HpLossAmount)];
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<OverwhelmingPowerPower>()];
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);

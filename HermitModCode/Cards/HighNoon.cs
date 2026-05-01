@@ -16,8 +16,6 @@ public sealed class HighNoon : HermitCard
 {
     public HighNoon() : base(1, CardType.Power, CardRarity.Rare, TargetType.None) { }
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<HighNoonPower>()];
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);

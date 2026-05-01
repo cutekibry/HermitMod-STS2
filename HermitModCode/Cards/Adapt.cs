@@ -12,8 +12,6 @@ public sealed class Adapt : HermitCard
 {
     public Adapt() : base(3, CardType.Power, CardRarity.Rare, TargetType.None) { }
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<AdaptPower>()];
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
