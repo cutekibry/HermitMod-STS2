@@ -15,8 +15,7 @@ public sealed class FullyLoaded : HermitCard
 {
     public FullyLoaded() : base(0, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        IsUpgraded ? [CardKeyword.Exhaust, CardKeyword.Retain] : [CardKeyword.Exhaust];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
@@ -40,6 +39,6 @@ public sealed class FullyLoaded : HermitCard
 
     protected override void OnUpgrade()
     {
-        // Upgrade adds Retain (handled by CanonicalKeywords), no cost change
+        AddKeyword(CardKeyword.Retain);
     }
 }

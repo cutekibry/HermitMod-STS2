@@ -1,10 +1,8 @@
-﻿using HermitMod.Cards;
-using MegaCrit.Sts2.Core.Commands;
+﻿using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.HoverTips;
-using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace HermitMod.Cards;
@@ -28,11 +26,10 @@ public sealed class Glare : HermitCard
         await PowerCmd.Apply<VulnerablePower>(ctx, play.Target, DynamicVars["WeakPower"].BaseValue, Owner.Creature, this);
     }
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        IsUpgraded ? [CardKeyword.Retain] : [];
-
     protected override void OnUpgrade()
     {
         DynamicVars["WeakPower"].UpgradeValueBy(1m);
+        AddKeyword(CardKeyword.Retain);
     }
+
 }

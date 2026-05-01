@@ -13,9 +13,6 @@ public sealed class Determination : HermitCard
 {
     public Determination() : base(1, CardType.Power, CardRarity.Uncommon, TargetType.None) { }
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        IsUpgraded ? [CardKeyword.Innate] : [];
-
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<StrengthPower>()];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
@@ -26,6 +23,6 @@ public sealed class Determination : HermitCard
 
     protected override void OnUpgrade()
     {
-        // Upgrade adds Innate (handled by CanonicalKeywords)
+        AddKeyword(CardKeyword.Innate);
     }
 }

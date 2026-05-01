@@ -20,6 +20,8 @@ public sealed class Snipe : HermitCard
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => IsUpgraded ? [HoverTipFactory.FromKeyword(HermitKeywords.Concentrate)] : [];
+
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
@@ -33,6 +35,5 @@ public sealed class Snipe : HermitCard
 
     protected override void OnUpgrade()
     {
-        // Upgrade adds Concentrate effect (handled in OnPlay)
     }
 }

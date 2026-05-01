@@ -15,8 +15,7 @@ public sealed class EternalForm : HermitCard
 {
     public EternalForm() : base(3, CardType.Power, CardRarity.Rare, TargetType.Self) { }
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        IsUpgraded ? [] : [CardKeyword.Ethereal];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Ethereal];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
@@ -26,6 +25,6 @@ public sealed class EternalForm : HermitCard
 
     protected override void OnUpgrade()
     {
-        // Upgrade removes Ethereal (handled by CanonicalKeywords)
+        RemoveKeyword(CardKeyword.Ethereal);
     }
 }

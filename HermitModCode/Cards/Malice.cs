@@ -1,11 +1,10 @@
-using HermitMod.Cards;
 using HermitMod.Utility;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
 
 namespace HermitMod.Cards;
@@ -21,7 +20,9 @@ public sealed class Malice : HermitCard
 
     public Malice() : base(2, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(DamageAmount, ValueProp.Move)];
+
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromKeyword(CardKeyword.Exhaust)];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
@@ -44,7 +45,7 @@ public sealed class Malice : HermitCard
             // Exhausted a Curse — deal damage to ALL enemies
             await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
                 .FromCard(this)
-                .TargetingAllOpponents(CombatState)
+                .TargetingAllOpponents(CombatState!)
                 .WithHermitFireHitFx()
                 .Execute(ctx);
         }
@@ -53,7 +54,7 @@ public sealed class Malice : HermitCard
             // Normal — deal damage to the single target
             await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
                 .FromCard(this)
-                .Targeting(play.Target)
+                .Targeting(play.Target!)
                 .WithHermitGunHitFx()
                 .Execute(ctx);
         }

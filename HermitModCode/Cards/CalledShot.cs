@@ -26,9 +26,6 @@ public sealed class CalledShot : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        IsUpgraded ? [CardKeyword.Retain] : [];
-
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
@@ -45,6 +42,6 @@ public sealed class CalledShot : HermitCard
     protected override void OnUpgrade()
     {
         DynamicVars.Damage.UpgradeValueBy(UpgradedDamageAmount - DamageAmount);
-        // Gain Retain keyword on upgrade
+        AddKeyword(CardKeyword.Retain);
     }
 }

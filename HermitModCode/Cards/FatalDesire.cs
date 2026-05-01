@@ -16,9 +16,6 @@ public sealed class FatalDesire : HermitCard
 {
     public FatalDesire() : base(1, CardType.Power, CardRarity.Rare, TargetType.Self) { }
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        IsUpgraded ? [CardKeyword.Innate] : [];
-
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromCard<Injury>()];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
@@ -29,6 +26,6 @@ public sealed class FatalDesire : HermitCard
 
     protected override void OnUpgrade()
     {
-        // Upgrade adds Innate (handled by CanonicalKeywords)
+        AddKeyword(CardKeyword.Innate);
     }
 }
