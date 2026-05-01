@@ -98,8 +98,10 @@ public class Hermit : PlaceholderCharacterModel
     public override string? CustomAttackSfx => "event:/sfx/enemy/enemy_attacks/crossbow_ruby_raider/crossbow_ruby_raider_reload";
     public override string? CustomCastSfx => null;
 
-    // Spine-based creature visual, energy counter, and merchant
-    public override string CustomVisualPath => "res://HermitMod/scenes/creature_visuals/hermit.tscn";
-    public override string? CustomEnergyCounterPath => "res://HermitMod/scenes/combat/energy_counters/hermit_energy_counter.tscn";
-    public override string CustomMerchantAnimPath => "res://HermitMod/scenes/merchant/characters/hermit_merchant.tscn";
+    // Pure Godot creature visual packaged with this mod.
+    public override string CustomVisualPath => "res://HermitMod/scenes/hermit_creature_visual.tscn";
+
+    // Leave these on the base-game defaults unless we have packaged scenes for them.
+    public override string? CustomEnergyCounterPath => base.CustomEnergyCounterPath;
+    public override string CustomMerchantAnimPath => base.CustomMerchantAnimPath;
 }
