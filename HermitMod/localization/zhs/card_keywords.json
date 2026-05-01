@@ -1,0 +1,16 @@
+{
+  "HERMITMOD-DEAD_ON.title": "精准",
+  "HERMITMOD-DEAD_ON.description": "精准牌位于手牌中央打出时会触发额外效果。",
+  "HERMITMOD-DEADON.title": "精准",
+  "HERMITMOD-DEADON.description": "精准牌位于手牌中央打出时会触发额外效果。",
+  "HERMITMOD-CONCENTRATE.title": "专注",
+  "HERMITMOD-CONCENTRATE.description": "专注时打出的下一张精准牌会无视位置触发精准效果。回合结束时失去本效果。",
+  "HERMITMOD-BRUISE.title": "瘀伤",
+  "HERMITMOD-BRUISE.description": "带有瘀伤的目标受到更多攻击伤害。回合结束时消失。",
+  "HERMITMOD-RUGGED.title": "坚固",
+  "HERMITMOD-RUGGED.description": "将下次受到的攻击伤害降低至2点。",
+  "HERMITMOD-BOUNTY.title": "赏金",
+  "HERMITMOD-BOUNTY.description": "普通敌人：15金币。精英敌人：40金币。首领：100金币。",
+  "HERMITMOD-STUN.title": "击晕",
+  "HERMITMOD-STUN.description": "被击晕的敌人会跳过其回合。"
+}

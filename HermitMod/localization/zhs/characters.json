@@ -1,0 +1,17 @@
+{
+  "HERMITMOD-HERMIT.title": "亡命之徒",
+  "HERMITMOD-HERMIT.titleObject": "亡命之徒",
+  "HERMITMOD-HERMIT.description": "一位从遥远国度来的不死枪客。\n被过去记忆中的幽灵所困扰，擅长使用手枪了结敌人。",
+  "HERMITMOD-HERMIT.pronounSubject": "他",
+  "HERMITMOD-HERMIT.pronounObject": "他",
+  "HERMITMOD-HERMIT.possessiveAdjective": "他的",
+  "HERMITMOD-HERMIT.pronounPossessive": "他的",
+  "HERMITMOD-HERMIT.goldMonologue": "[sine]这些金币……够买些弹药了……[/sine]",
+  "HERMITMOD-HERMIT.eventDeathPrevention": "还不行……我还有未了之事……",
+  "HERMITMOD-HERMIT.aromaPrinciple": "[sine][blue]……火药的气味……[/blue][/sine]",
+  "HERMITMOD-HERMIT.cardsModifierTitle": "亡命之徒",
+  "HERMITMOD-HERMIT.cardsModifierDescription": "亡命之徒的卡牌现在会出现在奖励和商店中。",
+  "HERMITMOD-HERMIT.banter.alive.endTurnPing": "……",
+  "HERMITMOD-HERMIT.banter.dead.endTurnPing": "……",
+  "HERMITMOD-HERMIT.unlockText": "使用[pink]{Prerequisite}[/pink]进行一局游戏以解锁该角色。"
+}
