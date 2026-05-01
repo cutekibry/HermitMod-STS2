@@ -9,7 +9,7 @@ namespace HermitMod.Cards;
 
 /// <summary>
 /// Apply 1 Weak and 1 Vulnerable to an enemy.
-/// Upgrade: Apply 2 of each.
+/// Upgrade: Retain.
 /// </summary>
 public sealed class Glare : HermitCard
 {
@@ -22,13 +22,12 @@ public sealed class Glare : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<WeakPower>(ctx, play.Target, DynamicVars["WeakPower"].BaseValue, Owner.Creature, this);
-        await PowerCmd.Apply<VulnerablePower>(ctx, play.Target, DynamicVars["WeakPower"].BaseValue, Owner.Creature, this);
+        await PowerCmd.Apply<WeakPower>(ctx, play.Target!, DynamicVars["WeakPower"].BaseValue, Owner.Creature, this);
+        await PowerCmd.Apply<VulnerablePower>(ctx, play.Target!, DynamicVars["WeakPower"].BaseValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["WeakPower"].UpgradeValueBy(1m);
         AddKeyword(CardKeyword.Retain);
     }
 
