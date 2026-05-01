@@ -33,9 +33,9 @@ public sealed class Horror : HermitCard
         int amount = IsUpgraded ? UpgradedBruiseAmount : BruiseAmount;
         foreach (var enemy in CombatState.HittableEnemies)
         {
-            await PowerCmd.Apply<BruisePower>(enemy, amount, Owner.Creature, this);
+            await PowerCmd.Apply<BruisePower>(ctx, enemy, amount, Owner.Creature, this);
             // Apply Horror to each enemy so their Bruise doesn't wear off this turn
-            await PowerCmd.Apply<HorrorPower>(enemy, 1, Owner.Creature, this);
+            await PowerCmd.Apply<HorrorPower>(ctx, enemy, 1, Owner.Creature, this);
         }
     }
 

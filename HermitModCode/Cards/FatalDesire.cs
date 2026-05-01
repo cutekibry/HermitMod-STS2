@@ -1,4 +1,4 @@
-using HermitMod.Powers;
+﻿using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -24,7 +24,7 @@ public sealed class FatalDesire : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<FatalDesirePower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<FatalDesirePower>(ctx, Owner.Creature, 1, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

@@ -24,7 +24,7 @@ public class HoleUp() : HermitCard(1, CardType.Skill, CardRarity.Common, TargetT
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
-        await PowerCmd.Apply<WeakPower>(Owner.Creature, 2, Owner.Creature, this);
+        await PowerCmd.Apply<WeakPower>(ctx, Owner.Creature, 2, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

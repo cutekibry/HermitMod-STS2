@@ -17,7 +17,7 @@ public sealed class Adapt : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<AdaptPower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<AdaptPower>(ctx, Owner.Creature, 1, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

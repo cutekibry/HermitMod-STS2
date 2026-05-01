@@ -41,7 +41,7 @@ public sealed class OverwhelmingPower : HermitCard
         await CardPileCmd.Draw(ctx, CurrentDraw, Owner, false);
 
         // Apply the debuff: lose HP when ending turn with 0 energy
-        await PowerCmd.Apply<OverwhelmingPowerPower>(Owner.Creature, CurrentHpLoss, Owner.Creature, this);
+        await PowerCmd.Apply<OverwhelmingPowerPower>(ctx, Owner.Creature, CurrentHpLoss, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

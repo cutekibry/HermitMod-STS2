@@ -27,7 +27,7 @@ public class PistolWhip() : HermitCard(1, CardType.Attack, CardRarity.Common, Ta
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitBluntLightHitFx().Execute(ctx);
         int bruise = DynamicVars["BruisePower"].IntValue;
-        await PowerCmd.Apply<BruisePower>(play.Target, bruise, Owner.Creature, this);
+        await PowerCmd.Apply<BruisePower>(ctx, play.Target, bruise, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

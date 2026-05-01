@@ -1,4 +1,4 @@
-using HermitMod.Cards;
+﻿using HermitMod.Cards;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.ValueProps;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -36,7 +36,7 @@ public sealed class FlashPowder : HermitCard
 
         foreach (Creature enemy in CombatState.HittableEnemies)
         {
-            await PowerCmd.Apply<StrengthPower>(enemy, -StrengthLoss, Owner.Creature, this);
+            await PowerCmd.Apply<StrengthPower>(ctx, enemy, -StrengthLoss, Owner.Creature, this);
         }
     }
 

@@ -47,7 +47,7 @@ public sealed class SprayPray : HermitCard
 
         // Shuffle a Doubt into the draw pile
         var doubt = CombatState.CreateCard<Doubt>(Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(doubt, PileType.Draw, addedByPlayer: true);
+        await CardPileCmd.AddGeneratedCardToCombat(doubt, PileType.Draw, Owner);
     }
 
     protected override void OnUpgrade()

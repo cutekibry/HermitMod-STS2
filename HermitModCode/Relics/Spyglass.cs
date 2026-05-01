@@ -15,7 +15,7 @@ public sealed class Spyglass : HermitRelic
 {
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext ctx, CombatSide side, CombatState combatState)
+    public override async Task BeforeSideTurnStart(PlayerChoiceContext ctx, CombatSide side, ICombatState combatState)
     {
         if (side != CombatSide.Player) return;
         Flash();

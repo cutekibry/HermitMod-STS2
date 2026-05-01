@@ -20,7 +20,7 @@ public sealed class BigShot : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<BigShotPower>(Owner.Creature, DynamicVars["BigShotPower"].IntValue, Owner.Creature, this);
+        await PowerCmd.Apply<BigShotPower>(ctx, Owner.Creature, DynamicVars["BigShotPower"].IntValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

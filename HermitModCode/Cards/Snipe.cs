@@ -25,11 +25,11 @@ public sealed class Snipe : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<SnipePower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<SnipePower>(ctx, Owner.Creature, 1, Owner.Creature, this);
 
         if (IsUpgraded)
         {
-            await PowerCmd.Apply<ConcentrationPower>(Owner.Creature, 1, Owner.Creature, this);
+            await PowerCmd.Apply<ConcentrationPower>(ctx, Owner.Creature, 1, Owner.Creature, this);
         }
     }
 

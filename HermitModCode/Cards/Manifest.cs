@@ -33,7 +33,7 @@ public sealed class Manifest : HermitCard
 
         // Add a Decay (base game curse) to the player's hand
         var decay = CombatState.CreateCard<MegaCrit.Sts2.Core.Models.Cards.Decay>(Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(decay, PileType.Hand, addedByPlayer: true);
+        await CardPileCmd.AddGeneratedCardToCombat(decay, PileType.Hand, Owner);
     }
 
     protected override void OnUpgrade()

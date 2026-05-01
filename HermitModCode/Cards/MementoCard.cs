@@ -41,11 +41,11 @@ public sealed class MementoCard : CustomCardModel
         // Apply to ALL enemies
         foreach (var enemy in CombatState.HittableEnemies)
         {
-            await PowerCmd.Apply<VulnerablePower>(enemy, amount, Owner.Creature, this);
+            await PowerCmd.Apply<VulnerablePower>(ctx, enemy, amount, Owner.Creature, this);
         }
 
         // Apply to player too (EVERYONE)
-        await PowerCmd.Apply<VulnerablePower>(Owner.Creature, amount, Owner.Creature, this);
+        await PowerCmd.Apply<VulnerablePower>(ctx, Owner.Creature, amount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

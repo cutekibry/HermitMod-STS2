@@ -1,4 +1,4 @@
-using HermitMod.Cards;
+﻿using HermitMod.Cards;
 using HermitMod.Character;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
@@ -26,13 +26,13 @@ public sealed class EyeOfTheStorm : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<ConcentrationPower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<ConcentrationPower>(ctx, Owner.Creature, 1, Owner.Creature, this);
         await PlayerCmd.GainEnergy(DynamicVars.Energy.BaseValue, Owner);
     }
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1); // 1 → 0
+        EnergyCost.UpgradeBy(-1); // 1 鈫?0
         EnergyCost.FinalizeUpgrade();
     }
 }

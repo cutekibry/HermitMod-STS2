@@ -1,4 +1,4 @@
-using HermitMod.Cards;
+﻿using HermitMod.Cards;
 using HermitMod.Character;
 using HermitMod.Powers;
 using MegaCrit.Sts2.Core.Commands;
@@ -23,11 +23,11 @@ public sealed class Brawl : HermitCard
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        await PowerCmd.Apply<BrawlPower>(Owner.Creature, DynamicVars["BruisePower"].IntValue, Owner.Creature, this);
+        await PowerCmd.Apply<BrawlPower>(ctx, Owner.Creature, DynamicVars["BruisePower"].IntValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["BruisePower"].UpgradeValueBy(2m); // 3 → 5
+        DynamicVars["BruisePower"].UpgradeValueBy(2m); // 3 鈫?5
     }
 }

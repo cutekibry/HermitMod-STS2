@@ -15,6 +15,6 @@ public sealed class TakeAimPower : HermitPower
     {
         if (player != Owner.Player) return;
         Flash();
-        await PowerCmd.Apply<ConcentrationPower>(Owner, 1, Owner, null);
+        await PowerCmd.Apply<ConcentrationPower>(choiceContext, Owner, 1, Owner, null);
     }
 }

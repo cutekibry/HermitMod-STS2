@@ -14,7 +14,7 @@ public sealed class ClaspedLocket : HermitRelic
 {
     public override RelicRarity Rarity => RelicRarity.Rare;
 
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext ctx, CombatSide side, CombatState combatState)
+    public override async Task BeforeSideTurnStart(PlayerChoiceContext ctx, CombatSide side, ICombatState combatState)
     {
         if (side != CombatSide.Player) return;
         Flash();
