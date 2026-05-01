@@ -15,8 +15,8 @@ namespace HermitMod.Cards;
 /// </summary>
 public sealed class HeroicBravado : HermitCard
 {
-    private const int CostReduction = 2;
-    private const int UpgradedCostReduction = 1;
+    private const int CostIncrease = 2;
+    private const int UpgradedCostIncrease = 1;
 
     public HeroicBravado() : base(1, CardType.Skill, CardRarity.Rare, TargetType.None) { }
 
@@ -24,22 +24,22 @@ public sealed class HeroicBravado : HermitCard
 
     protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Rugged];
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar("CostReduce", CostReduction)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar("CostIncrease", CostIncrease)];
 
     protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
-        // Reduce this card's cost for rest of combat
-        int reduction = DynamicVars["CostReduce"].IntValue;
-        var newCost = Math.Max(0, (int)EnergyCost.GetWithModifiers(default) - reduction);
+        // Increase this card's cost for rest of combat
+        int increase = DynamicVars["CostIncrease"].IntValue;
+        var newCost = Math.Max(0, (int)EnergyCost.GetWithModifiers(default) + increase);
         EnergyCost.SetCustomBaseCost(newCost);
 
-        await PowerCmd.Apply<RuggedPower>(Owner.Creature, 1, Owner.Creature, this);
+        await PowerCmd.Apply<RuggedPower>(ctx, Owner.Creature, 1, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["CostReduce"].UpgradeValueBy(UpgradedCostReduction - CostReduction);
+        DynamicVars["CostIncrease"].UpgradeValueBy(UpgradedCostIncrease - CostIncrease);
     }
 }
