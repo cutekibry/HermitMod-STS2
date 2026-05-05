@@ -5,6 +5,8 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
 
 namespace HermitMod.Cards;
@@ -18,38 +20,60 @@ public sealed class CursedWeapon : HermitCard
 {
     private const int BaseDamageAmount = 10;
     private const int HpLossAmount = 2;
-    private const int ScaleAmount = 1;
+    private const int IncreaseAmount = 1;
 
-    /// <summary>
-    /// Tracks the accumulated bonus damage from previous plays. Persists via DeckVersion.
-    /// </summary>
-    public int BonusDamage { get; set; }
+    private int _currentDamage = BaseDamageAmount;
+    private int _increasedDamage;
 
+    [SavedProperty]
+    public int CurrentDamage
+    {
+        get
+        {
+            return _currentDamage;
+        }
+        set
+        {
+            AssertMutable();
+            _currentDamage = value;
+            DynamicVars.Damage.BaseValue = _currentDamage;
+        }
+    }
+    [SavedProperty]
+    public int IncreasedDamage
+    {
+        get
+        {
+            return _increasedDamage;
+        }
+        set
+        {
+            AssertMutable();
+            _increasedDamage = value;
+        }
+    }
+    
     public CursedWeapon() : base(1, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DamageVar((decimal)BaseDamageAmount, ValueProp.Move),
-        new HpLossVar(HpLossAmount)
+        new DamageVar(BaseDamageAmount, ValueProp.Move),
+        new HpLossVar(HpLossAmount),
+        new DynamicVar("Increase", IncreaseAmount)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
-        // Lose HP first (matches original STS1 order)
-        await CreatureCmd.Damage(ctx, Owner.Creature, DynamicVars.HpLoss.BaseValue,
-            ValueProp.Unblockable | ValueProp.Unpowered, null, null);
+        await CreatureCmd.Damage(ctx, Owner.Creature, DynamicVars.HpLoss.BaseValue, ValueProp.Unblockable | ValueProp.Unpowered, Owner.Creature, this);
 
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target!).WithHermitFireHitFx().Execute(ctx);
 
-        decimal totalDamage = DynamicVars.Damage.BaseValue + BonusDamage;
-        await DamageCmd.Attack(totalDamage).FromCard(this).Targeting(play.Target).WithHermitFireHitFx().Execute(ctx);
-
-        // After dealing damage, permanently increase ALL Cursed Weapons' bonus damage
-        ScaleAllCursedWeapons();
+        BuffAllCursedWeapons();
     }
 
-    private void ScaleAllCursedWeapons()
+    private void BuffAllCursedWeapons()
     {
         foreach (var pileType in new[] { PileType.Hand, PileType.Draw, PileType.Discard, PileType.Exhaust })
         {
@@ -57,33 +81,33 @@ public sealed class CursedWeapon : HermitCard
             if (pile == null) continue;
             foreach (var card in pile.Cards)
             {
-                if (card is CursedWeapon cw)
-                    cw.BonusDamage += ScaleAmount;
+                if (card is CursedWeapon cw) {
+                    cw.BuffFromPlay();
+                    (cw.DeckVersion as CursedWeapon)?.BuffFromPlay();
+                }
             }
         }
-
-        // Scale this card too
-        BonusDamage += ScaleAmount;
-
-        // Scale deck versions so the increase persists across combats
-        if (DeckVersion is CursedWeapon deckCw)
-            deckCw.BonusDamage += ScaleAmount;
-
-        foreach (var pileType in new[] { PileType.Hand, PileType.Draw, PileType.Discard, PileType.Exhaust })
-        {
-            var pile = pileType.GetPile(Owner);
-            if (pile == null) continue;
-            foreach (var card in pile.Cards)
-            {
-                if (card is CursedWeapon otherCw && otherCw != this)
-                    if (otherCw.DeckVersion is CursedWeapon otherDeckCw)
-                        otherDeckCw.BonusDamage += ScaleAmount;
-            }
-        }
+        BuffFromPlay();
+        (DeckVersion as CursedWeapon)?.BuffFromPlay();
     }
 
     protected override void OnUpgrade()
     {
         EnergyCost.UpgradeBy(-1);
+    }
+
+
+    protected override void AfterDowngraded()
+    {
+        UpdateDamage();
+    }
+    private void BuffFromPlay()
+    {
+        IncreasedDamage += DynamicVars["Increase"].IntValue;
+        UpdateDamage();
+    }
+    private void UpdateDamage()
+    {
+        CurrentDamage = BaseDamageAmount + IncreasedDamage;
     }
 }

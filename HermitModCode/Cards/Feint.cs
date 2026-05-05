@@ -7,21 +7,23 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.HoverTips;
 
 namespace HermitMod.Cards;
 
 public class Feint() : HermitCard(0, CardType.Skill, CardRarity.Common, TargetType.Self)
 {
-    private const int Blk = 3;
-    private const int UpgradeBlk = 2;
-    private const int BruiseAmt = 2;
-    private const int UpgradedBruiseAmt = 3;
+    private const int BlockAmount = 3;
+    private const int UpgradedBlockAmount = 5;
+    private const int BruiseAmount = 2;
+    private const int UpgradedBruiseAmount = 3;
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)Blk, ValueProp.Move), new PowerVar<BruisePower>((decimal)BruiseAmt)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar(BlockAmount, ValueProp.Move), new PowerVar<BruisePower>(BruiseAmount)];
 
-    protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Bruise];
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<BruisePower>()];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
@@ -36,7 +38,7 @@ public class Feint() : HermitCard(0, CardType.Skill, CardRarity.Common, TargetTy
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Block.UpgradeValueBy(UpgradeBlk);
-        DynamicVars["BruisePower"].UpgradeValueBy(UpgradedBruiseAmt - BruiseAmt);
+        DynamicVars.Block.UpgradeValueBy(UpgradedBlockAmount - BlockAmount);
+        DynamicVars["BruisePower"].UpgradeValueBy(UpgradedBruiseAmount - BruiseAmount);
     }
 }

@@ -24,26 +24,23 @@ public sealed class Gestalt : HermitCard
     public Gestalt() : base(2, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new PowerVar<RuggedPower>((decimal)RuggedAmount),
-        new PowerVar<VulnerablePower>((decimal)BaseVulnAmount)
+        new PowerVar<RuggedPower>(RuggedAmount),
+        new PowerVar<VulnerablePower>(BaseVulnAmount)
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Rugged];
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<VulnerablePower>(), HoverTipFactory.FromPower<RuggedPower>()];
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<VulnerablePower>()];
-
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
-        int vulnAmount = IsUpgraded ? UpgradedVulnAmount : BaseVulnAmount;
-        await PowerCmd.Apply<VulnerablePower>(ctx, Owner.Creature, vulnAmount, Owner.Creature, this);
-        await PowerCmd.Apply<RuggedPower>(ctx, Owner.Creature, RuggedAmount, Owner.Creature, this);
+        await PowerCmd.Apply<RuggedPower>(ctx, Owner.Creature, DynamicVars["RuggedPower"].BaseValue, Owner.Creature, this);
+        await PowerCmd.Apply<VulnerablePower>(ctx, Owner.Creature, DynamicVars["VulnerablePower"].BaseValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["VulnerablePower"].UpgradeValueBy(UpgradedVulnAmount - BaseVulnAmount); // 2 鈫?1
+        DynamicVars["VulnerablePower"].UpgradeValueBy(UpgradedVulnAmount - BaseVulnAmount);
     }
 }

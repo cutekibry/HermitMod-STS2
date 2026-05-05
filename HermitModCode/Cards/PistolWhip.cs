@@ -8,21 +8,22 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.Core.HoverTips;
 
 namespace HermitMod.Cards;
 
 public class PistolWhip() : HermitCard(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
 {
-    private const int Dmg = 6;
-    private const int UpgradeDmg = 3;
-    private const int BruiseAmt = 3;
-    private const int UpgradedBruiseAmt = 5;
+    private const int DamageAmount = 6;
+    private const int UpgradedDamageAmount = 8;
+    private const int BruiseAmount = 3;
+    private const int UpgradedBruiseAmount = 5;
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)Dmg, ValueProp.Move), new PowerVar<BruisePower>((decimal)BruiseAmt)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(DamageAmount, ValueProp.Move), new PowerVar<BruisePower>(BruiseAmount)];
 
-    protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Bruise];
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<BruisePower>()];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitBluntLightHitFx().Execute(ctx);
@@ -32,7 +33,7 @@ public class PistolWhip() : HermitCard(1, CardType.Attack, CardRarity.Common, Ta
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Damage.UpgradeValueBy(UpgradeDmg);
-        DynamicVars["BruisePower"].UpgradeValueBy(UpgradedBruiseAmt - BruiseAmt);
+        DynamicVars.Damage.UpgradeValueBy(UpgradedDamageAmount - DamageAmount);
+        DynamicVars["BruisePower"].UpgradeValueBy(UpgradedBruiseAmount - BruiseAmount);
     }
 }

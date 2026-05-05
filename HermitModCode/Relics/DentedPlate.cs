@@ -1,9 +1,11 @@
-using HermitMod.Relics;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Models.Relics;
 
 namespace HermitMod.Relics;
 
@@ -14,16 +16,26 @@ public sealed class DentedPlate : HermitRelic
 {
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
-    public override async Task BeforeSideTurnStart(PlayerChoiceContext ctx, CombatSide side, ICombatState combatState)
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new EnergyVar(1)];
+
+    public override decimal ModifyHandDraw(Player player, decimal count)
     {
-        if (side != CombatSide.Player) return;
+        if(player != Owner || player.Creature.CurrentHp > player.Creature.MaxHp / 2)
+            return count;
+        return count + 1;
+    }
 
-        // Only trigger when HP is at or below 50%
-        var creature = Owner.Creature;
-        if (creature.CurrentHp > creature.MaxHp / 2) return;
-
-        Flash();
-        await PlayerCmd.GainEnergy(1m, Owner);
-        await CardPileCmd.Draw(ctx, 1, Owner, false);
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext ctx, Player player)
+    {
+        if (player != Owner)
+            return;
+        
+        if (player.Creature.CurrentHp <= player.Creature.MaxHp / 2) {
+            Status = RelicStatus.Active;
+            Flash();
+            await PlayerCmd.GainEnergy(DynamicVars.Energy.BaseValue, player);
+        }
+        else
+            Status = RelicStatus.Normal;
     }
 }

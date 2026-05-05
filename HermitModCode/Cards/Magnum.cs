@@ -24,7 +24,7 @@ public sealed class Magnum : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         // Prompt player to discard up to 6 cards
         var handCount = PileType.Hand.GetPile(Owner).Cards.Count;

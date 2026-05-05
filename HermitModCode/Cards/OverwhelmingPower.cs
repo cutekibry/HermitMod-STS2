@@ -28,7 +28,7 @@ public sealed class OverwhelmingPower : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new EnergyVar(EnergyGain), new CardsVar(DrawCount), new HpLossVar(HpLossAmount)];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 

@@ -1,10 +1,11 @@
 using HermitMod.Patches;
+using HermitMod.Powers;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Logging;
 
 namespace HermitMod.Cards;
 
@@ -24,61 +25,28 @@ public sealed class Cheat : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar(CardCount)];
 
-    private int CurrentCardCount => IsUpgraded ? UpgradedCardCount : CardCount;
-
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
         var drawPile = PileType.Draw.GetPile(Owner);
-        if (drawPile == null || drawPile.Cards.Count == 0)
+        var topCards = drawPile.Cards.Take(DynamicVars.Cards.IntValue).ToList();
+        if (topCards.Count == 0)
             return;
 
-        // Draw the top N cards to hand so they become visible for selection
-        int toDraw = Math.Min(CurrentCardCount, drawPile.Cards.Count);
-        int handBefore = PileType.Hand.GetPile(Owner)?.Cards.Count ?? 0;
-
-        await CardPileCmd.Draw(ctx, toDraw, Owner, false);
-
-        var hand = PileType.Hand.GetPile(Owner);
-        if (hand == null) return;
-
-        // The newly drawn cards are at the end of the hand
-        int handAfter = hand.Cards.Count;
-        int actualDrawn = handAfter - handBefore;
-        if (actualDrawn <= 0) return;
-
-        var drawnCards = hand.Cards.Skip(handBefore).Take(actualDrawn).ToList();
-
-        if (drawnCards.Count == 1)
-        {
-            // Only one card drawn — auto-select it
-            if (DeadOnHelper.IsDeadOn)
-                DeadOnHelper.ForceNextDeadOn = true;
-
-            await CardCmd.AutoPlay(ctx, drawnCards[0], null);
-            return;
-        }
-
-        // Let the player choose one card from the drawn cards
-        var prefs = new CardSelectorPrefs(SelectionScreenPrompt, 1);
         var selected = (await CardSelectCmd.FromSimpleGrid(
             ctx,
-            drawnCards,
+            topCards,
             Owner,
-            prefs
+            new CardSelectorPrefs(SelectionScreenPrompt, 1)
         )).FirstOrDefault();
 
         if (selected == null)
             return;
 
-        // If Dead On triggered, mark the selected card so its Dead On also triggers
-        if (DeadOnHelper.IsDeadOn)
-        {
-            DeadOnHelper.ForceNextDeadOn = true;
-        }
-
-        // Auto-play the selected card (it's already in hand)
+        if (IsDeadOn)
+            await PowerCmd.Apply<CheatPower>(ctx, Owner.Creature, 1, Owner.Creature, this, true);
+    
         await CardCmd.AutoPlay(ctx, selected, null);
     }
 

@@ -1,20 +1,22 @@
-using HermitMod.Cards;
+using BaseLib.Abstracts;
 using HermitMod.Patches;
 using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
 
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Deal 6 damage. Dead On: Gain Block equal to unblocked damage dealt.
-/// Upgrade: 9 damage.
+/// Deal 6 damage. Dead On: Gain Block equal to unblocked damage dealt first.
+/// Upgrade: 8 damage.
 /// </summary>
-public sealed class Snapshot : HermitCard
+public sealed class Snapshot : HermitCard, ITranscendenceCard
 {
     public override bool HasDeadOn => true;
 
@@ -23,37 +25,34 @@ public sealed class Snapshot : HermitCard
 
     public Snapshot() : base(1, CardType.Attack, CardRarity.Basic, TargetType.AnyEnemy) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(DamageAmount, ValueProp.Move)];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task BeforePlayInternalIfDeadOn(PlayerChoiceContext ctx, CardPlay play)
+    {
+        IRunState runState = IRunState.GetFrom([play.Target!, Owner.Creature]);
+        decimal modifiedDamage = Hook.ModifyDamage(runState, CombatState, play.Target!, Owner.Creature, DynamicVars.Damage.BaseValue, ValueProp.Move, this, ModifyDamageHookType.All, CardPreviewMode.None, out _);
+        int unblockedDamage = (int)(modifiedDamage - play.Target!.Block);
+        await CreatureCmd.GainBlock(Owner.Creature, unblockedDamage, ValueProp.Move, play);
+    }
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
         HermitSfx.PlayGun1();
-
-        // Record target HP before attack to calculate unblocked damage
-        int hpBefore = play.Target?.CurrentHp ?? 0;
-
+        
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
-            .Targeting(play.Target)
+            .Targeting(play.Target!)
             .WithHermitGunHitFx()
             .Execute(ctx);
-
-        if (DeadOnHelper.IsDeadOn && play.Target != null)
-        {
-            DeadOnHelper.IncrementDeadOnCount();
-            // Calculate unblocked damage: how much HP the target actually lost
-            int hpAfter = play.Target.IsDead ? 0 : play.Target.CurrentHp;
-            int unblockedDamage = hpBefore - hpAfter;
-            if (unblockedDamage > 0)
-            {
-                await CreatureCmd.GainBlock(Owner.Creature, (decimal)unblockedDamage, ValueProp.Move, play);
-            }
-        }
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Damage.UpgradeValueBy(UpgradedDamageAmount - DamageAmount);
+    }
+
+    public CardModel GetTranscendenceTransformedCard()
+    {
+        return ModelDb.Card<OneFlash>();
     }
 }

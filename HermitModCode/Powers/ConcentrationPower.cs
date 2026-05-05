@@ -1,8 +1,8 @@
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
 
 namespace HermitMod.Powers;
 
@@ -15,20 +15,12 @@ public sealed class ConcentrationPower : HermitPower
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    /// <summary>
-    /// Consumes one stack of Concentration. If no stacks remain, removes the power.
-    /// Called from DeadOnOnPlayWrapperPatch when Dead On triggers via Concentration.
-    /// </summary>
-    public void ConsumeStack()
+    public override async Task AfterDeadOnTriggered(PlayerChoiceContext ctx, CardPlay? play)
     {
-        SetAmount(Amount - 1);
-        if (Amount <= 0)
-        {
-            _ = PowerCmd.Remove(this);
-        }
+        await PowerCmd.Apply<ConcentrationPower>(ctx, Owner, -1, Owner, play?.Card);
     }
 
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterTurnEndLate(PlayerChoiceContext choiceContext, CombatSide side)
     {
         if (side != Owner.Side) return;
         await PowerCmd.Remove(this);

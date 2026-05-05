@@ -24,20 +24,18 @@ public sealed class Enervate : HermitCard
     public Enervate() : base(1, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new DamageVar((decimal)DamageAmount, ValueProp.Move),
+        new DamageVar(DamageAmount, ValueProp.Move),
     ];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
-        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitFireHitFx().Execute(ctx);
-
-        if (DeadOnHelper.IsDeadOn)
-        {
-            DeadOnHelper.IncrementDeadOnCount();
-            await PlayerCmd.GainEnergy(1, Owner);
-            await CardPileCmd.Draw(ctx, 1, Owner, false);
-        }
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target!).WithHermitFireHitFx().Execute(ctx);
+    }
+    override protected async Task AfterPlayInternalIfDeadOn(PlayerChoiceContext ctx, CardPlay play)
+    {
+        await PlayerCmd.GainEnergy(1, Owner);
+        await CardPileCmd.Draw(ctx, 1, Owner, false);
     }
 
     protected override void OnUpgrade()

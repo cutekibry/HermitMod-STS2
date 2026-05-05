@@ -1,4 +1,5 @@
 using HarmonyLib;
+using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Hooks;
 
 namespace HermitMod.Patches;
@@ -12,6 +13,6 @@ public static class DeadOnTurnResetPatch
     [HarmonyPrefix]
     public static void Prefix()
     {
-        DeadOnHelper.ResetTurnCount();
+        DeadOnCounter.Reset();
     }
 }

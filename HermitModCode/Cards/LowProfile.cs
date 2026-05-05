@@ -1,6 +1,6 @@
-using HermitMod.Cards;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Entities.Powers;
@@ -17,33 +17,43 @@ public sealed class LowProfile : HermitCard
 {
     private const int BlockAmount = 7;
     private const int UpgradedBlockAmount = 9;
-    private const int PerDebuffBlock = 4;
-    private const int UpgradedPerDebuffBlock = 5;
+    private const int ExtraBlock = 4;
+    private const int UpgradedExtraBlock = 5;
 
     public LowProfile() : base(1, CardType.Skill, CardRarity.Common, TargetType.None) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)BlockAmount, ValueProp.Move)];
+    public override bool GainsBlock => true;
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override IEnumerable<DynamicVar> CanonicalVars => [
+        new BlockVar(BlockAmount, ValueProp.Move),
+        new DynamicVar("ExtraBlock", ExtraBlock),
+        new CalculationBaseVar(BlockAmount),
+        new CalculationExtraVar(ExtraBlock),
+        new CalculatedBlockVar(ValueProp.Move).WithMultiplier(CountDebuffs)
+    ];
+
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
-        // Count debuffs on the player
-        int debuffCount = Owner.Creature.Powers
-            .Count(p => p.Type == PowerType.Debuff);
+        await CreatureCmd.GainBlock(
+            Owner.Creature,
+            DynamicVars.CalculatedBlock.Calculate(Owner.Creature),
+            DynamicVars.CalculatedBlock.Props,
+            play
+        );
+    }
 
-        int bonusBlock = (IsUpgraded ? UpgradedPerDebuffBlock : PerDebuffBlock) * debuffCount;
-
-        await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
-
-        if (bonusBlock > 0)
-        {
-            await CreatureCmd.GainBlock(Owner.Creature, (decimal)bonusBlock, ValueProp.Move, play);
-        }
+    private static decimal CountDebuffs(CardModel card, Creature? _)
+    {
+        return card.Owner.Creature.Powers.Count(p => p.Type == PowerType.Debuff || (p.Type == PowerType.Buff && p.Amount < 0));
     }
 
     protected override void OnUpgrade()
     {
         DynamicVars.Block.UpgradeValueBy(UpgradedBlockAmount - BlockAmount);
+        DynamicVars["ExtraBlock"].UpgradeValueBy(UpgradedExtraBlock - ExtraBlock);
+        DynamicVars.CalculationBase.UpgradeValueBy(UpgradedBlockAmount - BlockAmount);
+        DynamicVars.CalculationExtra.UpgradeValueBy(UpgradedExtraBlock - ExtraBlock);
     }
 }

@@ -1,6 +1,6 @@
 using MegaCrit.Sts2.Core.Entities.Creatures;
-using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.Entities.Relics;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 
@@ -13,6 +13,12 @@ namespace HermitMod.Relics;
 public sealed class Horseshoe : HermitRelic
 {
     public override RelicRarity Rarity => RelicRarity.Common;
+
+    protected override IEnumerable<IHoverTip> ExtraHoverTips => [
+        HoverTipFactory.FromPower<WeakPower>(),
+        HoverTipFactory.FromPower<FrailPower>(),
+        HoverTipFactory.FromPower<VulnerablePower>()
+    ];
 
     public override bool TryModifyPowerAmountReceived(
         PowerModel canonicalPower,
@@ -36,7 +42,17 @@ public sealed class Horseshoe : HermitRelic
             return false;
 
         // Reduce by 1, minimum 0
-        modifiedAmount = System.Math.Max(0m, amount - 1m);
+        modifiedAmount = Math.Max(0m, amount - 1m);
         return true;
+    }
+}
+
+internal class PowerHoverTip
+{
+    private Type type;
+
+    public PowerHoverTip(Type type)
+    {
+        this.type = type;
     }
 }

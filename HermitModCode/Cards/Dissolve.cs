@@ -18,21 +18,22 @@ public sealed class Dissolve : HermitCard
 {
     private const int BlockAmount = 18;
     private const int UpgradedBlockAmount = 25;
-    private const int BarricadeTurns = 2;
+    private const int BlurAmount = 2;
 
     public Dissolve() : base(2, CardType.Skill, CardRarity.Rare, TargetType.None) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)BlockAmount, ValueProp.Move)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [
+        new BlockVar(BlockAmount, ValueProp.Move),
+        new PowerVar<BlurPower>(BlurAmount)
+    ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
-
-        // Block not removed for 2 turns (apply Barricade-like duration effect)
-        await PowerCmd.Apply<BarricadePower>(ctx, Owner.Creature, BarricadeTurns, Owner.Creature, this);
+        await PowerCmd.Apply<BlurPower>(ctx, Owner.Creature, BlurAmount, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

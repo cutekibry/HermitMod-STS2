@@ -1,10 +1,12 @@
 using HermitMod.Cards;
+using HermitMod.Powers;
 using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
 namespace HermitMod.Cards;
@@ -25,13 +27,14 @@ public sealed class Quickdraw : HermitCard
 
     private int CurrentDraw => IsUpgraded ? UpgradedDrawCount : DrawCount;
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move), new CardsVar(DrawCount)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(DamageAmount, ValueProp.Move), new CardsVar(DrawCount)];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
-        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitBluntLightHitFx().Execute(ctx);
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target!).WithHermitBluntLightHitFx().Execute(ctx);
         await CardPileCmd.Draw(ctx, CurrentDraw, Owner, false);
+        await PowerCmd.Apply<DrawFewerCardsNextTurnPower>(ctx, Owner.Creature, 1, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

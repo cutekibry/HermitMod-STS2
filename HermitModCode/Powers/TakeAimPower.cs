@@ -2,7 +2,6 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
 
 namespace HermitMod.Powers;
 
@@ -15,6 +14,6 @@ public sealed class TakeAimPower : HermitPower
     {
         if (player != Owner.Player) return;
         Flash();
-        await PowerCmd.Apply<ConcentrationPower>(choiceContext, Owner, 1, Owner, null);
+        await PowerCmd.Apply<ConcentrationPower>(choiceContext, Owner, Amount, Owner, null);
     }
 }

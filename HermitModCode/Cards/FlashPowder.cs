@@ -18,30 +18,33 @@ namespace HermitMod.Cards;
 public sealed class FlashPowder : HermitCard
 {
     private const int BlockAmount = 5;
-    private const int UpgradedBlockAmount = 8;
-    private const int StrengthLoss = 2;
+    private const int StrengthLoss = 1;
+    private const int UpgradedStrengthLoss = 2;
 
     public FlashPowder() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new BlockVar((decimal)BlockAmount, ValueProp.Move)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [
+        new BlockVar(BlockAmount, ValueProp.Move),
+        new DynamicVar("StrengthLoss", StrengthLoss),
+    ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<StrengthPower>()];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
 
-        foreach (Creature enemy in CombatState.HittableEnemies)
+        foreach (Creature enemy in CombatState!.HittableEnemies)
         {
-            await PowerCmd.Apply<StrengthPower>(ctx, enemy, -StrengthLoss, Owner.Creature, this);
+            await PowerCmd.Apply<StrengthPower>(ctx, enemy, -DynamicVars["StrengthLoss"].BaseValue, Owner.Creature, this);
         }
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars.Block.UpgradeValueBy(UpgradedBlockAmount - BlockAmount);
+        DynamicVars["StrengthLoss"].UpgradeValueBy(UpgradedStrengthLoss - StrengthLoss);
     }
 }

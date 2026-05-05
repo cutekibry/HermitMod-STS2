@@ -7,6 +7,8 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Rooms;
 using HermitMod.Cards;
+using MegaCrit.Sts2.Core.Models.Relics;
+using MegaCrit.Sts2.Core.HoverTips;
 
 namespace HermitMod.Relics;
 
@@ -18,6 +20,13 @@ public sealed class OldLocket : HermitRelic
     public override RelicRarity Rarity => RelicRarity.Starter;
 
     private bool _firstTurn = true;
+
+    public override RelicModel? GetUpgradeReplacement()
+    {
+        return ModelDb.Relic<ClaspedLocket>();
+    }
+
+    protected override IEnumerable<IHoverTip> ExtraHoverTips => HoverTipFactory.FromCardWithCardHoverTips<MementoCard>();
 
     public override async Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
     {

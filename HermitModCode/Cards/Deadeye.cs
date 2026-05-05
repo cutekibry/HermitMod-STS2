@@ -1,14 +1,12 @@
-using HermitMod.Cards;
-using HermitMod.Patches;
 using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
+using HermitMod.Powers;
 
 namespace HermitMod.Cards;
 
@@ -31,21 +29,18 @@ public sealed class Deadeye : HermitCard
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<StrengthPower>()];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
         await DamageCmd.Attack(DynamicVars.Damage.BaseValue)
             .FromCard(this)
-            .Targeting(play.Target)
+            .Targeting(play.Target!)
             .WithHermitBluntHeavyHitFx()
             .Execute(ctx);
-
-        if (DeadOnHelper.IsDeadOn)
-        {
-            DeadOnHelper.IncrementDeadOnCount();
-            int str = DynamicVars["StrengthPower"].IntValue;
-            await PowerCmd.Apply<StrengthPower>(ctx, Owner.Creature, str, Owner.Creature, this);
-        }
+    }
+    protected override async Task AfterPlayInternalIfDeadOn(PlayerChoiceContext ctx, CardPlay play)
+    {
+        await PowerCmd.Apply<StrengthPower>(ctx, Owner.Creature, DynamicVars["StrengthPower"].IntValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

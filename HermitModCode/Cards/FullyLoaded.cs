@@ -1,8 +1,10 @@
 using HermitMod.Cards;
+using HermitMod.Character;
 using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 
 namespace HermitMod.Cards;
@@ -17,7 +19,9 @@ public sealed class FullyLoaded : HermitCard
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromKeyword(HermitKeywords.Strike), HoverTipFactory.FromKeyword(HermitKeywords.Defend)];
+
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         HermitSfx.PlaySpin();
         HermitSfx.PlayReload();

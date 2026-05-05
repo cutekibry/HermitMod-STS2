@@ -7,35 +7,16 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace HermitMod.Powers;
 
-/// <summary>
-/// Rugged: Reduces next instance(s) of attack damage taken to 2.
-/// Each stack = one instance of damage reduction.
-/// Uses ModifyHpLostBeforeOsty to cap incoming damage and consume stacks.
-/// </summary>
 public sealed class RuggedPower : HermitPower
 {
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    /// <summary>
-    /// When the owner would lose HP from an attack, cap the damage to 2 and consume a stack.
-    /// </summary>
     public override decimal ModifyHpLostBeforeOsty(Creature target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
     {
-        // Only protect the owner, only when we have stacks, only for actual damage
         if (target != Owner || Amount <= 0 || amount <= 0m)
             return amount;
-
-        // Consume a stack via SetAmount (Amount setter is private)
         SetAmount(Amount - 1);
-
-        // If no stacks remain, schedule removal
-        if (Amount <= 0)
-        {
-            _ = PowerCmd.Remove(this);
-        }
-
-        // Cap damage to 2
         return Math.Min(amount, 2m);
     }
 }

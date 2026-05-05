@@ -1,8 +1,11 @@
 using HermitMod.Cards;
+using HermitMod.Character;
 using HermitMod.Utility;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
@@ -20,24 +23,27 @@ public sealed class Showdown : HermitCard
 
     public Showdown() : base(1, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(DamageAmount, ValueProp.Move)];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromKeyword(HermitKeywords.Strike)];
+
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Attack", Owner.Character.AttackAnimDelay);
         HermitSfx.PlayGun2();
-        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitGunHitFx().Execute(ctx);
+        await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target!).WithHermitGunHitFx().Execute(ctx);
 
         // Auto-play all Strikes in hand (match by type, not rarity — covers Hermit and base game Strikes)
         var strikes = PileType.Hand.GetPile(Owner).Cards
-            .Where(c => c is Strike_Hermit || c.Id.Entry.Contains("STRIKE", StringComparison.OrdinalIgnoreCase))
+            .Where(c => c.Tags.Contains(CardTag.Strike))
             .ToList();
 
         foreach (var strike in strikes)
         {
-            if (play.Target?.IsDead == true) break;
-            if (MegaCrit.Sts2.Core.Combat.CombatManager.Instance.IsOverOrEnding) break;
-            await CardCmd.AutoPlay(ctx, strike, play.Target);
+            Creature? enemy = Owner.RunState.Rng.CombatTargets.NextItem(CombatState!.HittableEnemies);
+            if (enemy == null)
+                break;
+            await CardCmd.AutoPlay(ctx, strike, enemy);
         }
     }
 

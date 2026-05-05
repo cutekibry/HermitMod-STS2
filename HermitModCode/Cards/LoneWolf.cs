@@ -15,7 +15,7 @@ public sealed class LoneWolf : HermitCard
 {
     public LoneWolf() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 

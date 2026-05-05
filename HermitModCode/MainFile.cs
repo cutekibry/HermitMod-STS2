@@ -1,8 +1,6 @@
-using System;
 using System.Reflection;
 using Godot;
 using HarmonyLib;
-using HermitMod.Patches;
 using MegaCrit.Sts2.Core.Modding;
 
 namespace HermitMod;
@@ -17,8 +15,6 @@ public partial class MainFile : Node
     public static void Initialize()
     {
         // Register custom Hermit epochs into the game's EpochModel system
-        EpochRegistration.RegisterEpochs();
-
         Harmony harmony = new(ModId);
 
         // Patch each type individually so one failure doesn't block everything

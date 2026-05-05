@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 
 namespace HermitMod.Cards;
 
@@ -20,28 +21,21 @@ public sealed class LuckOfTheDraw : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar("Threshold", CostThreshold)];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
         int threshold = DynamicVars["Threshold"].IntValue;
         int totalCost = 0;
 
-        while (totalCost < threshold)
+        while (totalCost < threshold && PileType.Hand.GetPile(Owner)!.Cards.Count < 10)
         {
-            int handBefore = PileType.Hand.GetPile(Owner)?.Cards.Count ?? 0;
-            await CardPileCmd.Draw(ctx, 1, Owner, false);
-            int handAfter = PileType.Hand.GetPile(Owner)?.Cards.Count ?? 0;
+            var cards = (await CardPileCmd.Draw(ctx, 1, Owner)).ToList();
+            if(cards.Count == 0)
+                break;
 
-            if (handAfter <= handBefore) break;
-
-            var hand = PileType.Hand.GetPile(Owner);
-            if (hand != null && hand.Cards.Count > 0)
-            {
-                var lastCard = hand.Cards[^1];
-                int cardCost = lastCard.EnergyCost.GetWithModifiers(CostModifiers.None);
-                totalCost += cardCost;
-            }
+            var card = cards[0];
+            totalCost += card.EnergyCost.GetWithModifiers(CostModifiers.Local);
         }
     }
 

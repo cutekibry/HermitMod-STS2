@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.Core.HoverTips;
 
 namespace HermitMod.Cards;
 
@@ -21,13 +22,13 @@ public sealed class TrackingShot : HermitCard
     private const int UpgradedDamageAmount = 7;
     private const int HitCount = 2;
 
-    public TrackingShot() : base(1, CardType.Attack, CardRarity.Uncommon, TargetType.AnyEnemy) { }
+    public TrackingShot() : base(1, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy) { }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar((decimal)DamageAmount, ValueProp.Move)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(DamageAmount, ValueProp.Move)];
 
-    protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Concentrate];
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<ConcentrationPower>()];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         // Concentrate: apply Concentration power
         await PowerCmd.Apply<ConcentrationPower>(ctx, Owner.Creature, 1, Owner.Creature, this);
@@ -40,7 +41,7 @@ public sealed class TrackingShot : HermitCard
                 HermitSfx.PlayGun3();
             else
                 HermitSfx.PlayGun1();
-            await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target).WithHermitGunHitFx().Execute(ctx);
+            await DamageCmd.Attack(DynamicVars.Damage.BaseValue).FromCard(this).Targeting(play.Target!).WithHermitGunHitFx().Execute(ctx);
         }
     }
 

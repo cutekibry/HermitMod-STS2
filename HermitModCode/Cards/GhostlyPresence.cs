@@ -31,20 +31,15 @@ public sealed class GhostlyPresence : HermitCard
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<WeakPower>()];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
-
-        if (DeadOnHelper.IsDeadOn)
-        {
-            DeadOnHelper.IncrementDeadOnCount();
-            int weak = DynamicVars["WeakPower"].IntValue;
-            foreach (Creature enemy in CombatState.HittableEnemies)
-            {
-                await PowerCmd.Apply<WeakPower>(ctx, enemy, weak, Owner.Creature, this);
-            }
-        }
+    }
+    protected override async Task AfterPlayInternalIfDeadOn(PlayerChoiceContext ctx, CardPlay play)
+    {
+        foreach (Creature enemy in CombatState!.HittableEnemies)
+            await PowerCmd.Apply<WeakPower>(ctx, enemy, DynamicVars["WeakPower"].BaseValue, Owner.Creature, this);
     }
 
     protected override void OnUpgrade()

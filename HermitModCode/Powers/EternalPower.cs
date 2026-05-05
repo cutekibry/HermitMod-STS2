@@ -7,34 +7,55 @@ using MegaCrit.Sts2.Core.Models;
 namespace HermitMod.Powers;
 
 /// <summary>
-/// First 4 playable cards drawn at the start of each turn cost X less that turn.
-/// X = power stack amount.
+/// First X playable cards drawn at the start of each turn cost 1 less that turn.
 /// </summary>
 public sealed class EternalPower : HermitPower
 {
+
+    private class Data
+    {
+        public int cardsReducedThisTurn = 0;
+    }
+
+
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    private int _cardsReducedThisTurn;
+    public override int DisplayAmount => Math.Max(0, Amount - GetInternalData<Data>().cardsReducedThisTurn);
 
-    public override Task BeforeSideTurnStart(PlayerChoiceContext choiceContext, CombatSide side, ICombatState combatState)
+    protected override object InitInternalData()
     {
-        _cardsReducedThisTurn = 0;
+        return new Data();
+    }
+
+    public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side) {
+        if (side != Owner.Side)
+        {
+            return Task.CompletedTask;
+        }
+
+        SetCardsReducedThisTurn(0);
         return Task.CompletedTask;
     }
 
+    private void SetCardsReducedThisTurn(int value)
+    {
+        GetInternalData<Data>().cardsReducedThisTurn = value;
+        InvokeDisplayAmountChanged();
+    }
+
+
     public override Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
     {
-        if (_cardsReducedThisTurn >= 4) return Task.CompletedTask;
-        if (card.EnergyCost.CostsX) return Task.CompletedTask;
+        if (
+            GetInternalData<Data>().cardsReducedThisTurn >= Amount
+        || card.Owner.Creature != Owner
+        || card.Keywords.Contains(CardKeyword.Unplayable)
+        )
+            return Task.CompletedTask;
 
-        // Only reduce cost for cards owned by this power's owner (fixes multiplayer)
-        if (card.Owner != Owner.Player) return Task.CompletedTask;
-
-        // Reduce cost by Amount (power stacks) this turn
-        card.EnergyCost.AddThisTurnOrUntilPlayed(-Amount, reduceOnly: true);
-        _cardsReducedThisTurn++;
-
+        card.EnergyCost.AddThisTurnOrUntilPlayed(-1, reduceOnly: true);
+        SetCardsReducedThisTurn(GetInternalData<Data>().cardsReducedThisTurn + 1);
         return Task.CompletedTask;
     }
 }

@@ -2,7 +2,6 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
 
 namespace HermitMod.Powers;
 
@@ -15,11 +14,7 @@ public sealed class HighNoonPower : HermitPower
     {
         if (cardPlay.Card.Owner != Owner.Player) return;
 
-        var cardName = cardPlay.Card.GetType().Name;
-        bool isStrike = cardName.Contains("Strike");
-        bool isDefend = cardName.Contains("Defend");
-
-        if (isStrike || isDefend)
+        if (cardPlay.Card.Tags.Contains(CardTag.Strike) || cardPlay.Card.Tags.Contains(CardTag.Defend))
         {
             Flash();
             await CardPileCmd.Draw(context, Amount, Owner.Player!, false);

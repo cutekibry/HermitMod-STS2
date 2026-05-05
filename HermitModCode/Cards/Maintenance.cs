@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
+using HermitMod.Character;
 
 namespace HermitMod.Cards;
 
@@ -24,13 +25,13 @@ public sealed class Maintenance : HermitCard
     public Maintenance() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new PowerVar<MaintenanceStrikePower>((decimal)StrikeDmg),
-        new PowerVar<DexterityPower>((decimal)DexAmount)
+        new PowerVar<MaintenanceStrikePower>(StrikeDmg),
+        new PowerVar<DexterityPower>(DexAmount)
     ];
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<DexterityPower>()];
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<DexterityPower>(), HoverTipFactory.FromKeyword(HermitKeywords.Strike)];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         int strikeDmg = IsUpgraded ? UpgradedStrikeDmg : StrikeDmg;

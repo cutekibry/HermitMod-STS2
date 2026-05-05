@@ -1,5 +1,5 @@
 using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
@@ -8,18 +8,26 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace HermitMod.Powers;
 
 /// <summary>
-/// At the start of your turn, gain Block equal to your Concentration stacks.
+/// Whenever you draw or Exhaust a Curse card, gain 4(6) Block.
 /// </summary>
 public sealed class ShadowCloakPower : HermitPower
 {
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext ctx, Player player)
+    public override async Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
     {
-        if (player != Owner.Player) return;
+        if (card.Owner.Creature != Owner || card.Type != CardType.Curse)
+            return;
+        await CreatureCmd.TriggerAnim(Owner, "Cast", Owner.Player!.Character.CastAnimDelay);
+        await CreatureCmd.GainBlock(Owner, Amount, ValueProp.Unpowered, null);
+    }
 
-        Flash();
-        await CreatureCmd.GainBlock(Owner, Amount, ValueProp.Unpowered, null, false);
+    public override async Task AfterCardExhausted(PlayerChoiceContext choiceContext, CardModel card, bool causedByEthereal)
+    {
+        if (card.Owner.Creature != Owner || card.Type != CardType.Curse)
+            return;
+        await CreatureCmd.TriggerAnim(Owner, "Cast", Owner.Player!.Character.CastAnimDelay);
+        await CreatureCmd.GainBlock(Owner, Amount, ValueProp.Unpowered, null);
     }
 }

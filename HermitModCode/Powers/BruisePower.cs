@@ -36,13 +36,7 @@ public sealed class BruisePower : HermitPower
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
-        if (side == Owner.Side)
-        {
-            // If Horror is active on this creature, Bruise doesn't wear off
-            if (Owner.HasPower<HorrorPower>())
-                return;
-
+        if (side == Owner.Side && !Owner.HasPower<HorrorPower>())
             await PowerCmd.Remove(this);
-        }
     }
 }

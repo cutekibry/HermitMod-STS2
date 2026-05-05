@@ -16,9 +16,9 @@ public sealed class Brawl : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<BruisePower>(3m)];
 
-    protected override IEnumerable<CardKeyword> CustomKeywords => [HermitKeywords.Bruise];
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => [HoverTipFactory.FromPower<BruisePower>()];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await PowerCmd.Apply<BrawlPower>(ctx, Owner.Creature, DynamicVars["BruisePower"].IntValue, Owner.Creature, this);

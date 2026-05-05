@@ -1,31 +1,23 @@
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace HermitMod.Powers;
 
 /// <summary>
-/// Smoking Barrel: Whenever you trigger a Dead On effect, your next attack deals X more damage.
-/// Damage modification is handled via Harmony patches.
+/// At the start of your turn, you can Exhaust a card to gain 8 Block.
+/// Stacks increase block gained (8 per stack).
 /// </summary>
 public sealed class BigShotPower : HermitPower
 {
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    private int _bonusDamage;
-
-    public int BonusDamage => _bonusDamage;
-
-    public void AddBonus()
+    public override async Task AfterDeadOnTriggered(PlayerChoiceContext ctx, CardPlay? play)
     {
-        _bonusDamage += Amount;
-        Flash();
+        await PowerCmd.Apply<VigorPower>(ctx, Owner, Amount, Owner, play?.Card);
     }
 
-    public int ConsumeBonus()
-    {
-        int bonus = _bonusDamage;
-        _bonusDamage = 0;
-        return bonus;
-    }
 }

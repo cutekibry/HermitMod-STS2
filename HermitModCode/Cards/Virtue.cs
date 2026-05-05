@@ -1,16 +1,13 @@
-using HermitMod.Cards;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Cards;
 
 namespace HermitMod.Cards;
 
 /// <summary>
-/// Retain. Reduce each debuff on you by 1.
+/// Retain. Reduce each stackable debuff on you by 1.
 /// Upgrade: Reduce by 2.
 /// </summary>
 public sealed class Virtue : HermitCard
@@ -24,7 +21,7 @@ public sealed class Virtue : HermitCard
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar("Reduce", ReduceAmount)];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
 
@@ -34,15 +31,20 @@ public sealed class Virtue : HermitCard
 
         foreach (var power in powers)
         {
-            if (power.Type == PowerType.Debuff && power.Amount > 0)
-            {
-                if (power.Amount <= reduceBy)
+            if (power.StackType == PowerStackType.Counter) {
+                if (power.Type == PowerType.Debuff && power.Amount > 0)
                 {
-                    await PowerCmd.Remove(power);
+                    if (power.Amount <= reduceBy)
+                        await PowerCmd.Remove(power);
+                    else
+                        power.SetAmount(power.Amount - reduceBy);
                 }
-                else
+                else if(power.Type == PowerType.Buff && power.Amount < 0)
                 {
-                    power.SetAmount(power.Amount - reduceBy);
+                    if (power.Amount >= -reduceBy)
+                        await PowerCmd.Remove(power);
+                    else
+                        power.SetAmount(power.Amount + reduceBy);
                 }
             }
         }

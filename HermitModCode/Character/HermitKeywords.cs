@@ -15,21 +15,13 @@ public static class HermitKeywords
 
     [CustomEnum]
     [KeywordProperties(AutoKeywordPosition.None)]
-    public static CardKeyword Concentrate;
-
-    [CustomEnum]
-    [KeywordProperties(AutoKeywordPosition.None)]
-    public static CardKeyword Bruise;
-
-    [CustomEnum]
-    [KeywordProperties(AutoKeywordPosition.None)]
-    public static CardKeyword Rugged;
-
-    [CustomEnum]
-    [KeywordProperties(AutoKeywordPosition.None)]
     public static CardKeyword Bounty;
 
     [CustomEnum]
     [KeywordProperties(AutoKeywordPosition.None)]
-    public static CardKeyword Stun;
+    public static CardKeyword Strike;
+
+    [CustomEnum]
+    [KeywordProperties(AutoKeywordPosition.None)]
+    public static CardKeyword Defend;
 }

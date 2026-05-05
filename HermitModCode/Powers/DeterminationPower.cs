@@ -18,19 +18,8 @@ public sealed class DeterminationPower : HermitPower
     public override async Task AfterPowerAmountChanged(
         PlayerChoiceContext choiceContext, PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
-        // Only respond to debuffs applied to our owner
-        if (power.Owner != Owner) return;
-
-        // Don't react to our own Strength grants (prevent infinite loop)
-        if (power is StrengthPower) return;
-
-        // Only debuffs
-        if (power.Type != PowerType.Debuff) return;
-
-        // Only when the debuff amount is positive (application, not reduction)
-        if (amount <= 0) return;
-
-        // Grant Strength equal to this power's amount
-        await PowerCmd.Apply<StrengthPower>(choiceContext, Owner, Amount, Owner, null);
+        if (power.Owner == Owner
+        && ((power.Type == PowerType.Debuff && amount > 0) || ((power is StrengthPower || power is DexterityPower) && amount < 0)))
+            await PowerCmd.Apply<StrengthPower>(choiceContext, Owner, Amount, Owner, null);
     }
 }

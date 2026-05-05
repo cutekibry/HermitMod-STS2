@@ -20,9 +20,9 @@ public sealed class Snipe : HermitCard
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    protected override IEnumerable<IHoverTip> AdditionalHoverTips => IsUpgraded ? [HoverTipFactory.FromKeyword(HermitKeywords.Concentrate)] : [];
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => IsUpgraded ? [HoverTipFactory.FromPower<ConcentrationPower>()] : [];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await PowerCmd.Apply<SnipePower>(ctx, Owner.Creature, 1, Owner.Creature, this);

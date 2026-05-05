@@ -26,14 +26,14 @@ public class Hermit : PlaceholderCharacterModel
 
     public override IEnumerable<CardModel> StartingDeck =>
     [
-        ModelDb.Card<Strike_Hermit>(),
-        ModelDb.Card<Strike_Hermit>(),
-        ModelDb.Card<Strike_Hermit>(),
-        ModelDb.Card<Strike_Hermit>(),
-        ModelDb.Card<Defend_Hermit>(),
-        ModelDb.Card<Defend_Hermit>(),
-        ModelDb.Card<Defend_Hermit>(),
-        ModelDb.Card<Defend_Hermit>(),
+        ModelDb.Card<StrikeHermit>(),
+        ModelDb.Card<StrikeHermit>(),
+        ModelDb.Card<StrikeHermit>(),
+        ModelDb.Card<StrikeHermit>(),
+        ModelDb.Card<DefendHermit>(),
+        ModelDb.Card<DefendHermit>(),
+        ModelDb.Card<DefendHermit>(),
+        ModelDb.Card<DefendHermit>(),
         ModelDb.Card<Covet>(),
         ModelDb.Card<Snapshot>()
     ];
@@ -75,15 +75,16 @@ public class Hermit : PlaceholderCharacterModel
         }
     }
     public override string CustomIconTexturePath => "character_icon_hermit.png".CharacterUiPath();
+    public override string CustomIconOutlineTexturePath => "character_icon_hermit_outline.png".CharacterUiPath();
 
     // Map marker
     public override string CustomMapMarkerPath => "map_marker_hermit.png".CharacterUiPath();
 
     // Multiplayer arm textures (relic selection / rock-paper-scissors)
-    public override string? CustomArmPointingTexturePath => "hermit_arm_point.png".CharacterUiPath();
-    public override string? CustomArmRockTexturePath => "hermit_arm_rock.png".CharacterUiPath();
-    public override string? CustomArmPaperTexturePath => "hermit_arm_paper.png".CharacterUiPath();
-    public override string? CustomArmScissorsTexturePath => "hermit_arm_scissors.png".CharacterUiPath();
+    public override string CustomArmPointingTexturePath => "hermit_arm_point.png".CharacterUiPath();
+    public override string CustomArmRockTexturePath => "hermit_arm_rock.png".CharacterUiPath();
+    public override string CustomArmPaperTexturePath => "hermit_arm_paper.png".CharacterUiPath();
+    public override string CustomArmScissorsTexturePath => "hermit_arm_scissors.png".CharacterUiPath();
 
     // Sound effects
     public override string CharacterSelectSfx
@@ -95,13 +96,13 @@ public class Hermit : PlaceholderCharacterModel
         }
     }
     public override string CharacterTransitionSfx => "event:/sfx/ui/wipe_ironclad";
-    public override string? CustomAttackSfx => "event:/sfx/enemy/enemy_attacks/crossbow_ruby_raider/crossbow_ruby_raider_reload";
-    public override string? CustomCastSfx => null;
+    public override string CustomAttackSfx => "event:/sfx/enemy/enemy_attacks/crossbow_ruby_raider/crossbow_ruby_raider_reload";
+    // public override string? CustomCastSfx => null;
 
     // Pure Godot creature visual packaged with this mod.
     public override string CustomVisualPath => "res://HermitMod/scenes/hermit_creature_visual.tscn";
 
     // Leave these on the base-game defaults unless we have packaged scenes for them.
-    public override string? CustomEnergyCounterPath => base.CustomEnergyCounterPath;
+    public override string CustomEnergyCounterPath => base.CustomEnergyCounterPath;
     public override string CustomMerchantAnimPath => base.CustomMerchantAnimPath;
 }

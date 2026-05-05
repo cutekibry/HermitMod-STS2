@@ -2,6 +2,8 @@ using BaseLib.Abstracts;
 using BaseLib.Extensions;
 using HermitMod.Extensions;
 using Godot;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Entities.Cards;
 
 namespace HermitMod.Powers;
 
@@ -27,4 +29,6 @@ public abstract class HermitPower : CustomPowerModel
             return ResourceLoader.Exists(path) ? path : "concentration.png".BigPowerImagePath();
         }
     }
+
+    public virtual Task AfterDeadOnTriggered(PlayerChoiceContext playerChoiceContext, CardPlay? cardPlay) => Task.CompletedTask;
 }

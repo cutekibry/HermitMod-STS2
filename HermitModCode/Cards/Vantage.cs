@@ -11,43 +11,40 @@ namespace HermitMod.Cards;
 
 /// <summary>
 /// Gain 7 Block. Dead On: Draw and Upgrade a card.
-/// Upgrade: Draw and Upgrade 2.
+/// Upgrade: Gain 9 Block, Draw and Upgrade 2.
 /// </summary>
 public sealed class Vantage : HermitCard
 {
     public override bool HasDeadOn => true;
 
     private const int BlockAmount = 7;
+    private const int UpgradedBlockAmount = 9;
     private const int DrawUpgradeCount = 1;
     private const int UpgradedDrawUpgradeCount = 2;
 
-    public Vantage() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.None) { }
+    public Vantage() : base(1, CardType.Skill, CardRarity.Common, TargetType.Self) { }
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [
-        new BlockVar((decimal)BlockAmount, ValueProp.Move),
-        new CardsVar("DrawUpgrade", DrawUpgradeCount)
+        new BlockVar(BlockAmount, ValueProp.Move),
+        new CardsVar(DrawUpgradeCount)
     ];
 
-    protected override async Task OnPlay(PlayerChoiceContext ctx, CardPlay play)
+    protected override async Task OnPlayInternal(PlayerChoiceContext ctx, CardPlay play)
     {
         await CreatureCmd.TriggerAnim(Owner.Creature, "Cast", Owner.Character.CastAnimDelay);
         await CreatureCmd.GainBlock(Owner.Creature, DynamicVars.Block, play);
-
-        if (DeadOnHelper.IsDeadOn)
-        {
-            DeadOnHelper.IncrementDeadOnCount();
-            int count = DynamicVars["DrawUpgrade"].IntValue;
-            var drawn = await CardPileCmd.Draw(ctx, count, Owner, false);
-            foreach (var card in drawn)
-            {
-                if (card != null && card.IsUpgradable)
-                    CardCmd.Upgrade(card);
-            }
-        }
+    }
+    protected override async Task AfterPlayInternalIfDeadOn(PlayerChoiceContext ctx, CardPlay play)
+    {
+        var drawn = await CardPileCmd.Draw(ctx, DynamicVars.Cards.BaseValue, Owner);
+        foreach (var card in drawn)
+            if (card != null && card.IsUpgradable)
+                CardCmd.Upgrade(card);
     }
 
     protected override void OnUpgrade()
     {
-        DynamicVars["DrawUpgrade"].UpgradeValueBy(UpgradedDrawUpgradeCount - DrawUpgradeCount);
+        DynamicVars.Block.UpgradeValueBy(UpgradedBlockAmount - BlockAmount);
+        DynamicVars.Cards.UpgradeValueBy(UpgradedDrawUpgradeCount - DrawUpgradeCount);
     }
 }
